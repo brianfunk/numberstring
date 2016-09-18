@@ -1,4 +1,6 @@
 [![numberstring](https://img.shields.io/badge/numberstring-%23%20%22%20%22-brightgreen.svg)](https://github.com/brianfunk/numberstring)
+[![GitHub](https://img.shields.io/github/release/brianfunk/numberstring.svg?maxAge=2592000)](https://github.com/brianfunk/numberstring)
+[![npm](https://img.shields.io/npm/v/numberstring.svg?maxAge=2592000)](https://www.npmjs.com/package/numberstring)
 [![Code Climate](https://codeclimate.com/repos/57ddda322e9d4f14f8000f5d/badges/c29cb38ba98e57fc1708/gpa.svg)](https://codeclimate.com/repos/57ddda322e9d4f14f8000f5d/feed)
 [![codecov](https://codecov.io/gh/brianfunk/numberstring/branch/dev/graph/badge.svg)](https://codecov.io/gh/brianfunk/numberstring)
 [![TravisCI](https://travis-ci.org/brianfunk/numberstring.svg?branch=dev)](https://travis-ci.org/brianfunk/numberstring)

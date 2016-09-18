@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - "6"
+  - "5"
+  - "4"
+  
+before_script:
+  - npm install -g istanbul
+  - npm install -g mocha
+  
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+  
+addons:
+    code_climate:
+        repo_token: fdd38e75529ce5c9f98058cd846159d03c3fa5a358a76b81526670886b92f966
+        

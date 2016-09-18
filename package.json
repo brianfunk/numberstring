@@ -1,6 +1,6 @@
 {
   "name": "numberstring",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Number One Way to Makes Words from Numbers",
   "main": "index.js",
   "scripts": {

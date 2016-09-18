@@ -52,9 +52,11 @@ var string = function(n) {
 			for (var i=group(n); i >= 0; i-- ) {					
 				
 				s += hundred( hundment(n,i) );
-				s += ten( tenment(n,i) );	
-				
-				s += illions[i] + ' ';
+				s += ten( tenment(n,i) );					
+			
+				if ( hundment(n,i) > 0 ) {
+					s += illions[i] + ' ';
+				}
 			}	
 		}
 		

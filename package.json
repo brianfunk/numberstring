@@ -1,0 +1,37 @@
+{
+  "name": "numberstring",
+  "version": "0.0.1",
+  "description": "Number One Way to Makes Words from Numbers",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test",
+    "start": "node index.js",
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brianfunk/numberstring.git"
+  },
+  "keywords": [
+    "number",
+    "string",
+    "word",
+    "int",
+    "integer",
+    "text",
+    "num"
+  ],
+  "author": "Brian Funk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brianfunk/numberstring/issues"
+  },
+  "homepage": "https://github.com/brianfunk/numberstring#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "codeclimate-test-reporter": "^0.3.3",
+    "codecov": "^1.0.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.0.2"
+  }
+}

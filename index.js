@@ -22,48 +22,8 @@
 var ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 var tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 var teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-var illions = ['', 'thousand', 'million', 'billion', 'trillion', 'quintillion', 'sextillion', 'septillion', 'octillion', 'nonillion', 'decillion']
+var illions = ['', 'thousand', 'million', 'billion', 'trillion', 'quintillion', 'sextillion', 'septillion', 'octillion', 'nonillion', 'decillion'];
 
-//*******************************************************************
-
-var string = function(n) {
-	
-	if (isNaN(n)) {
-		//console.error('n isNaN : ' + n);
-		return false;
-	}
-	else if (typeof n !== 'number'){
-		//console.error('n typeof : ' + n);
-		return false;
-	}
-	else if (n > Number.MAX_SAFE_INTEGER) {
-		//console.error('n MAX_SAFE_INTEGER : ' + n);
-		return false;
-	}
-	else {			
-		
-		var s = '';
-		
-		if (n === 0) {			
-			s = 'zero';
-		}
-		else {				
-	
-			for (var i=group(n); i >= 0; i-- ) {					
-				
-				s += hundred( hundment(n,i) );
-				s += ten( tenment(n,i) );					
-			
-				if ( hundment(n,i) > 0 ) {
-					s += illions[i] + ' ';
-				}
-			}	
-		}
-		
-		s = s.trim();
-		return s;	
-	}	
-}
 
 //*******************************************************************
 
@@ -73,7 +33,7 @@ var comma = function(n) {
 		return false;
 	}
 	else {		
-		return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	}		
 }
 
@@ -113,10 +73,10 @@ var tenment = function(n,g) {
 
 var hundred = function(n) {
 	
-	if (n < 100) {		
+	if (n < 100) {
 		return '';
 	}
-	else if (n > 1000) {		
+	else if (n > 1000) {
 		return '';
 	}
 	else {
@@ -143,6 +103,47 @@ var ten = function(n) {
 		else {
 			return tens[Math.floor(n / 10)] + ' ';
 		}
+	}
+}
+
+//*******************************************************************
+
+var string = function(n) {
+	
+	if (isNaN(n)) {
+		//console.error('n isNaN : ' + n);
+		return false;
+	}
+	else if (typeof n !== 'number') {
+		//console.error('n typeof : ' + n);
+		return false;
+	}
+	else if (n > Number.MAX_SAFE_INTEGER) {
+		//console.error('n MAX_SAFE_INTEGER : ' + n);
+		return false;
+	}
+	else {			
+		
+		var s = '';
+		
+		if (n === 0) {			
+			s = 'zero';
+		}
+		else {				
+	
+			for (var i=group(n); i >= 0; i-- ) {					
+				
+				s += hundred( hundment(n,i) );
+				s += ten( tenment(n,i) );					
+			
+				if ( hundment(n,i) > 0 ) {
+					s += illions[i] + ' ';
+				}
+			}	
+		}
+		
+		s = s.trim();
+		return s;	
 	}
 }
 

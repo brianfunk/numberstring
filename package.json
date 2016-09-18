@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test",
     "start": "node index.js",
-	"coverage": "istanbul cover ./node_modules/mocha/bin/_mocha"
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
   "homepage": "https://github.com/brianfunk/numberstring#readme",
   "devDependencies": {
     "chai": "^3.5.0",
+    "codecov": "^1.0.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.0.2"
   }

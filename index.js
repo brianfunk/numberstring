@@ -24,18 +24,7 @@ var tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'e
 var teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 var illions = ['', 'thousand', 'million', 'billion', 'trillion', 'quintillion', 'sextillion', 'septillion', 'octillion', 'nonillion', 'decillion'];
 
-
 //*******************************************************************
-
-var comma = function(n) {
-	
-	if (isNaN(n)) {
-		return false;
-	}
-	else {		
-		return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-	}		
-}
 
 var group = function(n) {	
 
@@ -108,7 +97,47 @@ var ten = function(n) {
 
 //*******************************************************************
 
-var string = function(n) {
+var cap = function(str,c) {
+
+	if (c === 'title') {		
+		return str.replace(/\w([^-\s]*)/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+	}
+	else if (c === 'upper') {
+		return str.toUpperCase();		
+	}
+	else if (c === 'lower') {		
+		return str.toLowerCase();	
+	}
+	else{
+		return str;
+	}	
+}
+
+var punc = function(str,p) {
+
+	if ( p.match(/[!?.]/g) ) {		
+		return str += p;
+	}
+	else { 
+		return str;
+	}	
+}
+
+//*******************************************************************
+
+var comma = function(n) {
+	
+	if (isNaN(n)) {
+		return false;
+	}
+	else {		
+		return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	}		
+}
+
+//*******************************************************************
+
+var string = function(n, opt) {
 	
 	if (isNaN(n)) {
 		//console.error('n isNaN : ' + n);
@@ -143,6 +172,16 @@ var string = function(n) {
 		}
 		
 		s = s.trim();
+		
+		if (opt) {			
+			if (opt.cap) {
+				s = cap(s, opt.cap);	
+			}
+			if (opt.punc) {
+				s = punc(s, opt.punc);	
+			}				
+		}
+		
 		return s;	
 	}
 }

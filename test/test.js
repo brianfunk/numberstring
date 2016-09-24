@@ -100,6 +100,46 @@ describe('numberstring', function() {
   
 });
 
+//*******************************************************************
+
+describe('numberstring options', function() {	
+ 
+	it('should use lower case capitalization option - five hundred', function() {
+		expect( numberstring(500, {"cap": "lower"}) ).to.equal('five hundred');
+	});
+	
+	it('should use upper case capitalization option - FIVE HUNDRED', function() {
+		expect( numberstring(500, {"cap": "upper"}) ).to.equal('FIVE HUNDRED');
+	});
+	
+	it('should use title case capitalization option - Five Hundred', function() {
+		expect( numberstring(500, {"cap": "title"}) ).to.equal('Five Hundred');
+	});
+	
+	it('should use title case capitalization option with hyphen - Fifty-Five', function() {
+		expect( numberstring(55, {"cap": "title"}) ).to.equal('Fifty-Five');
+	});
+	
+	it('should use exclamation punctuation option - five hundred!', function() {
+		expect( numberstring(500, {"punc": "!"}) ).to.equal('five hundred!');
+	});
+	
+	it('should use question punctuation option - five hundred?', function() {
+		expect( numberstring(500, {"punc": "?"}) ).to.equal('five hundred?');
+	});
+	
+	it('should use period punctuation option - five hundred.', function() {
+		expect( numberstring(500, {"punc": "."}) ).to.equal('five hundred.');
+	});
+	
+	it('should use both capitalization and punctuation option - Fifty-Five!', function() {
+		expect( numberstring(55, {"cap": "title", "punc": "!"}) ).to.equal('Fifty-Five!');
+	});
+  
+});
+
+//*******************************************************************
+
 describe('numberstring.comma', function() {
   
 	it('should return string from a number', function() {
@@ -120,4 +160,5 @@ describe('numberstring.comma', function() {
   
 });
 
+//*******************************************************************
 

@@ -26,41 +26,36 @@ var illions = ['', 'thousand', 'million', 'billion', 'trillion', 'quintillion', 
 
 //*******************************************************************
 
-var group = function(n) {	
+var group = function(n) {
 
-	return Math.ceil(n.toString().length / 3) - 1;	
-}
+	return (Math.ceil(n.toString().length / 3) - 1);	
+};
 
 /*
 var illion = function(n) {	
-
 	return illions[group(n)];
 }
 */
 
-var power = function(n,g) {
-	
+var power = function(n,g) {	
 	// g = group
 	return Math.pow(10,(g*3));
-}
+};
 
-var segment = function(n,g) {
-	
+var segment = function(n,g) {	
 	// g = group
 	return (n % (power(n,g+1)));
-}
+};
 
-var hundment = function(n,g) {	
-	
+var hundment = function(n,g) {
 	// g = group
 	return Math.floor( segment(n,g) / power(n,g) );
-}
+};
 
-var tenment = function(n,g) {
-	
+var tenment = function(n,g) {	
 	// g = group
 	return (hundment(n,g) % 100);
-}
+};
 
 var hundred = function(n) {
 	
@@ -70,7 +65,7 @@ var hundred = function(n) {
 	else {
 		return (ones[Math.floor(n / 100)] + ' hundred ');	
 	}
-}
+};
 
 var ten = function(n) {
 	
@@ -92,7 +87,7 @@ var ten = function(n) {
 			return (tens[Math.floor(n / 10)] + ' ');
 		}
 	}
-}
+};
 
 //*******************************************************************
 
@@ -110,7 +105,7 @@ var cap = function(str,c) {
 	else{
 		return str;
 	}
-}
+};
 
 var punc = function(str,p) {
 
@@ -120,7 +115,7 @@ var punc = function(str,p) {
 	else { 
 		return str;
 	}	
-}
+};
 
 //*******************************************************************
 
@@ -132,7 +127,7 @@ var comma = function(n) {
 	else {		
 		return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	}		
-}
+};
 
 //*******************************************************************
 
@@ -183,7 +178,7 @@ var string = function(n, opt) {
 		
 		return s;
 	}
-}
+};
 
 //*******************************************************************
 

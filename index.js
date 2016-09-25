@@ -33,19 +33,19 @@ var group = function(n) {
 
 var illion = function(n) {	
 
-	return illions[group(n)];	
+	return illions[group(n)];
 }
 
-var power = function(n,g) {	
+var power = function(n,g) {
 	
 	// g = group
-	return Math.pow(10,(g*3));	
+	return Math.pow(10,(g*3));
 }
 
-var segment = function(n,g) {	
+var segment = function(n,g) {
 	
 	// g = group
-	return (n % (power(n,g+1)));	
+	return (n % (power(n,g+1)));
 }
 
 var hundment = function(n,g) {	
@@ -54,10 +54,10 @@ var hundment = function(n,g) {
 	return Math.floor( segment(n,g) / power(n,g) );
 }
 
-var tenment = function(n,g) {	
+var tenment = function(n,g) {
 	
 	// g = group
-	return hundment(n,g) % 100;
+	return (hundment(n,g) % 100);
 }
 
 var hundred = function(n) {
@@ -69,28 +69,28 @@ var hundred = function(n) {
 		return '';
 	}
 	else {
-		return ones[Math.floor(n / 100)] + ' hundred ';	
+		return (ones[Math.floor(n / 100)] + ' hundred ');	
 	}
 }
 
 var ten = function(n) {
 	
 	if (n === 0) {
-		return '';		
+		return '';
 	}
 	else if ((n < 10) && (n >= 0)) {
-		return ones[n] + ' ';	
+		return (ones[n] + ' ');
 	}
 	else if ((n < 20) && (n >= 10)) {
-		return teens[n - 10] + ' ';	
+		return (teens[n - 10] + ' ');	
 	}
 	else {
 		
 		if (ones[n % 10]) {
-			return tens[Math.floor(n / 10)] + '-' + ones[n % 10] + ' ';				
+			return (tens[Math.floor(n / 10)] + '-' + ones[n % 10] + ' ');	
 		}
 		else {
-			return tens[Math.floor(n / 10)] + ' ';
+			return (tens[Math.floor(n / 10)] + ' ');
 		}
 	}
 }
@@ -103,20 +103,20 @@ var cap = function(str,c) {
 		return str.replace(/\w([^-\s]*)/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 	}
 	else if (c === 'upper') {
-		return str.toUpperCase();		
+		return str.toUpperCase();
 	}
-	else if (c === 'lower') {		
-		return str.toLowerCase();	
+	else if (c === 'lower') {
+		return str.toLowerCase();
 	}
 	else{
 		return str;
-	}	
+	}
 }
 
 var punc = function(str,p) {
 
-	if ( p.match(/[!?.]/g) ) {		
-		return str += p;
+	if ( p.match(/[!?.]/g) ) {
+		return (str += p);
 	}
 	else { 
 		return str;
@@ -155,15 +155,15 @@ var string = function(n, opt) {
 		
 		var s = '';
 		
-		if (n === 0) {			
+		if (n === 0) {
 			s = 'zero';
 		}
 		else {				
 	
-			for (var i=group(n); i >= 0; i-- ) {					
+			for (var i=group(n); i >= 0; i-- ) {
 				
 				s += hundred( hundment(n,i) );
-				s += ten( tenment(n,i) );					
+				s += ten( tenment(n,i) );
 			
 				if ( hundment(n,i) > 0 ) {
 					s += illions[i] + ' ';
@@ -175,14 +175,14 @@ var string = function(n, opt) {
 		
 		if (opt) {			
 			if (opt.cap) {
-				s = cap(s, opt.cap);	
+				s = cap(s, opt.cap);
 			}
 			if (opt.punc) {
-				s = punc(s, opt.punc);	
+				s = punc(s, opt.punc);
 			}				
 		}
 		
-		return s;	
+		return s;
 	}
 }
 

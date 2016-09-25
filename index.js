@@ -31,10 +31,12 @@ var group = function(n) {
 	return Math.ceil(n.toString().length / 3) - 1;	
 }
 
+/*
 var illion = function(n) {	
 
 	return illions[group(n)];
 }
+*/
 
 var power = function(n,g) {
 	
@@ -62,10 +64,7 @@ var tenment = function(n,g) {
 
 var hundred = function(n) {
 	
-	if (n < 100) {
-		return '';
-	}
-	else if (n > 1000) {
+	if ((n < 100) || (n > 1000)) {
 		return '';
 	}
 	else {

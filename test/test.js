@@ -135,6 +135,14 @@ describe('numberstring options', function() {
 	it('should use both capitalization and punctuation option - Fifty-Five!', function() {
 		expect( numberstring(55, {"cap": "title", "punc": "!"}) ).to.equal('Fifty-Five!');
 	});
+	
+	it('should ignore invalid capitalization option', function() {
+		expect( numberstring(500, {"cap": "topper"}) ).to.equal('five hundred');
+	});
+	
+	it('should ignore invalid punctuation option', function() {
+		expect( numberstring(500, {"punc": "&"}) ).to.equal('five hundred');
+	});
   
 });
 

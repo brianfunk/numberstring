@@ -45,6 +45,10 @@ describe('numberstring', function() {
 	it('should be false if not a number', function() {
 		expect( numberstring('one') ).to.be.false;
 	});
+    
+    it('should be false if a negative number', function() {
+		expect( numberstring(-1) ).to.be.false;
+	});
 
 	it('should be false if typeof not a number', function() {
 		expect( numberstring(false) ).to.be.false;

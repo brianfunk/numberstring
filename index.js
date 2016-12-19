@@ -141,6 +141,10 @@ var string = function(n, opt) {
 		//console.error('n typeof : ' + n);
 		return false;
 	}
+    else if (n < 0) {
+		//console.error('n MAX_SAFE_INTEGER : ' + n);
+		return false;
+	}
 	else if (n > Number.MAX_SAFE_INTEGER) {
 		//console.error('n MAX_SAFE_INTEGER : ' + n);
 		return false;

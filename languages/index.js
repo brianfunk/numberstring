@@ -19,6 +19,7 @@ import danish from './da.js';
 import chinese from './zh.js';
 import hindi from './hi.js';
 import russian from './ru.js';
+import portuguese from './pt.js';
 
 /** Supported language codes and aliases */
 const LANGUAGES = Object.freeze({
@@ -45,7 +46,10 @@ const LANGUAGES = Object.freeze({
   'हिन्दी': 'hindi',
   ru: 'russian',
   russian: 'russian',
-  'русский': 'russian'
+  'русский': 'russian',
+  pt: 'portuguese',
+  portuguese: 'portuguese',
+  português: 'portuguese'
 });
 
 export {
@@ -57,5 +61,6 @@ export {
   chinese,
   hindi,
   russian,
+  portuguese,
   LANGUAGES
 };

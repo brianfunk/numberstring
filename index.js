@@ -19,7 +19,7 @@
  */
 
 // Import language functions
-import { english, spanish, french, german, danish, chinese, hindi, russian, LANGUAGES } from './languages/index.js';
+import { english, spanish, french, german, danish, chinese, hindi, russian, portuguese, LANGUAGES } from './languages/index.js';
 
 // Re-export language functions
 export { spanish, french, german, danish, chinese, hindi, russian };
@@ -629,6 +629,9 @@ const toWords = (n, opt) => {
       break;
     case 'russian':
       result = russian(n);
+      break;
+    case 'portuguese':
+      result = portuguese(n);
       break;
     default:
       result = english(n);

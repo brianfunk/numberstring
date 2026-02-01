@@ -15,4 +15,9 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm ci
       - run: npm run lint
-      - run: npm run test:coverage
+      - name: Run tests
+        if: matrix.node == 18
+        run: npm test
+      - name: Run tests with coverage
+        if: matrix.node != 18
+        run: npm run test:coverage

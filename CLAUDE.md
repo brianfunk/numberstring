@@ -69,22 +69,19 @@ Key constants:
 
 ---
 
-## How Claude Should Work
+## Working Style
 
-### Planning Before Coding
-For complex tasks, thoroughly plan before writing code. Create a clear implementation plan, identify affected files, and consider edge cases. A well-thought-out plan enables one-shot implementations with fewer iterations.
+### Think First, Code Second
+For anything non-trivial, plan the approach before writing code. Identify which files change, what the edge cases are, and how to verify it works. A solid plan means fewer iterations and cleaner implementations.
 
-### Self-Improvement
-When corrected on a mistake, propose an update to this CLAUDE.md file to prevent the same mistake in future sessions. Be specific about what went wrong and how to avoid it.
+### Own the Problem
+When something's broken - CI failing, bug reported, error in logs - just go fix it. Read the error, trace the cause, implement the fix. Don't wait for instructions on each step.
 
-### Autonomous Problem Solving
-When asked to fix bugs or failing tests, investigate independently. Check CI logs, read error messages, trace the issue, and fix it without requiring step-by-step guidance. Use subagents for complex multi-file investigations to keep the main context focused.
+### Verify, Don't Assume
+After making changes, prove they work. Run the tests. Check the output. If asked to review code, be genuinely critical - find the issues, don't just approve.
 
-### Code Review Mindset
-When asked to review changes, be critical and thorough. Identify potential issues, suggest improvements, and verify the solution actually works. Don't just rubber-stamp changes - challenge assumptions and prove correctness.
+### When Stuck or Wrong
+If a solution feels hacky, stop. Rethink from scratch using what you learned. If corrected on a mistake, suggest a CLAUDE.md update to prevent it happening again - be specific about what to avoid.
 
-### Iterative Refinement
-If an initial solution feels hacky or overly complex, step back and reconsider. Sometimes the best approach is to scrap a mediocre implementation and design a cleaner solution from scratch, using everything learned from the first attempt.
-
-### Context Efficiency
-Offload discrete subtasks to subagents to preserve main context for high-level coordination. This is especially useful for research, file exploration, and isolated fixes that don't need full conversation history.
+### Stay Focused
+Use subagents for research, exploration, or isolated subtasks. Keep the main conversation for coordinating and making decisions.

@@ -22,6 +22,8 @@
  * REST API for number-to-word conversions
  */
 
+/* global process */
+
 import express from 'express';
 import numberstring, {
   comma,

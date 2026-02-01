@@ -1,42 +1,41 @@
-# Tests
-test
-tests
-testing
+# Server (API) - repo only, not published to npm
+server/
 
-# Services
+# Tests
+test/
+coverage/
+vitest.config.js
+
+# Development
+demo.js
+.github/
+eslint.config.js
+
+# Documentation (README is included by default)
+CLAUDE.md
+AGENTS.md
+CHANGELOG.md
+
+# Old CI/services (removed)
 .codeclimate.yml
 .travis.yml
 codecov.yml
+
+# Git
+.git/
 .gitignore
 
 # Logs
-logs
 *.log
 npm-debug.log*
 
-# Runtime data
-pids
-*.pid
-*.seed
+# Editor
+.vscode/
+.idea/
 
-# Coverage directory used by tools like istanbul
-coverage
+# OS
+.DS_Store
+Thumbs.db
 
-# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
-
-# Dependency directories
-node_modules
-jspm_packages
-
-# Optional npm cache directory
-.npm
-
-# Optional REPL history
-.node_repl_history
+# Dependencies
+node_modules/

@@ -1,12 +1,21 @@
 {
   "name": "numberstring",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Number One Way to Makes Words from Numbers",
+  "type": "module",
   "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js"
+    }
+  },
   "scripts": {
-    "test": "mocha test",
-    "start": "node index.js",
-    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha"
+    "demo": "node demo.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --format stylish",
+    "lint:report": "eslint . --format html -o coverage/lint-report.html"
   },
   "repository": {
     "type": "git",
@@ -16,10 +25,14 @@
     "number",
     "string",
     "word",
-    "int",
+    "words",
     "integer",
+    "bigint",
     "text",
-    "num"
+    "convert",
+    "english",
+    "quintillion",
+    "decillion"
   ],
   "author": "Brian Funk",
   "license": "MIT",
@@ -27,11 +40,12 @@
     "url": "https://github.com/brianfunk/numberstring/issues"
   },
   "homepage": "https://github.com/brianfunk/numberstring#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "codeclimate-test-reporter": "^0.3.3",
-    "codecov": "^1.0.1",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.0.2"
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^9.17.0",
+    "vitest": "^4.0.18"
   }
 }

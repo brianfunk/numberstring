@@ -2,7 +2,7 @@
  * numberstring API Server Tests
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { createApp } from './index.js';
 

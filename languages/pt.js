@@ -16,7 +16,6 @@ const group = (n) => Math.ceil(n.toString().length / 3) - 1;
 const power = (g) => 10n ** BigInt(g * 3);
 const segment = (n, g) => n % power(g + 1);
 const hundment = (n, g) => Number(segment(n, g) / power(g));
-const tenment = (n, g) => hundment(n, g) % 100;
 
 const hundredPt = (n) => {
   if (n < 100 || n >= 1000) return '';
@@ -119,7 +118,6 @@ const portuguese = (n, opt) => {
   for (let i = 0; i < parts.length; i++) {
     if (i > 0) {
       // Use "e" (and) for connecting in Portuguese
-      const prevPart = parts[i - 1];
       const currPart = parts[i];
       // Add "e" when the current part is less than 100 or ends with 00
       if (currPart && !currPart.includes('mil') && !currPart.includes('ilhão') && !currPart.includes('ilhões')) {

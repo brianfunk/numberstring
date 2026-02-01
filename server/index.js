@@ -73,7 +73,9 @@ export const createApp = () => {
         { code: 'de', name: 'German (Deutsch)' },
         { code: 'da', name: 'Danish (Dansk)' },
         { code: 'zh', name: 'Chinese (中文)' },
-        { code: 'hi', name: 'Hindi (हिन्दी)' }
+        { code: 'hi', name: 'Hindi (हिन्दी)' },
+        { code: 'ru', name: 'Russian (Русский)' },
+        { code: 'pt', name: 'Portuguese (Português)' }
       ]
     });
   });
@@ -84,7 +86,18 @@ export const createApp = () => {
     const { number } = req.params;
     const { lang, cap: capStyle, punc } = req.query;
 
-    const num = number.includes('n') ? BigInt(number.replace('n', '')) : parseInt(number, 10);
+    let num;
+    try {
+      num = number.includes('n') ? BigInt(number.replace('n', '')) : parseInt(number, 10);
+    } catch {
+      res.status(400).json({ error: 'Invalid number', input: number });
+      return;
+    }
+
+    if (typeof num === 'number' && isNaN(num)) {
+      res.status(400).json({ error: 'Invalid number', input: number });
+      return;
+    }
 
     const opt = {};
     if (lang) opt.lang = lang;

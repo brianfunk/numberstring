@@ -16,7 +16,7 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 ## Why numberstring?
 
 - **Zero dependencies** - Lightweight and fast
-- **8 languages** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian
+- **9 languages** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian, Portuguese
 - **Huge range** - Supports 0 to decillions (10^36) with BigInt
 - **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers
 - **Roman numerals** - Convert to and from Roman numerals
@@ -191,10 +191,10 @@ comma(1234567);  // '1,234,567'
 
 ## Multi-Language Support
 
-numberstring supports 8 languages! Each language is in a separate file for easy tree-shaking.
+numberstring supports 9 languages! Each language is in a separate file for easy tree-shaking.
 
 ```javascript
-import { toWords, spanish, french, german, danish, chinese, hindi, russian } from 'numberstring';
+import { toWords, spanish, french, german, danish, chinese, hindi, russian, portuguese } from 'numberstring';
 
 // Using toWords with lang option
 toWords(42, { lang: 'es' });  // 'cuarenta y dos'
@@ -204,13 +204,15 @@ toWords(42, { lang: 'da' });  // 'toogfyrre'
 toWords(42, { lang: 'zh' });  // '四十二'
 toWords(42, { lang: 'hi' });  // 'बयालीस'
 toWords(42, { lang: 'ru' });  // 'сорок два'
+toWords(42, { lang: 'pt' });  // 'quarenta e dois'
 
 // Or use language functions directly
-spanish(1000);  // 'mil'
-french(80);     // 'quatre-vingts'
-german(21);     // 'einundzwanzig'
-chinese(10000); // '一万'
-russian(2000);  // 'две тысячи'
+spanish(1000);    // 'mil'
+french(80);       // 'quatre-vingts'
+german(21);       // 'einundzwanzig'
+chinese(10000);   // '一万'
+russian(2000);    // 'две тысячи'
+portuguese(100);  // 'cem'
 ```
 
 ### Adding a New Language
@@ -248,6 +250,41 @@ Languages are modular! To add a new language:
 | **Octillions** | 10^27 | `five octillion` *(BigInt)* |
 | **Nonillions** | 10^30 | `five nonillion` *(BigInt)* |
 | **Decillions** | 10^33 | `five decillion` *(BigInt)* |
+
+## REST API Server
+
+numberstring includes a ready-to-use REST API server!
+
+```bash
+cd server
+npm install
+npm start
+# Server running at http://localhost:3456
+```
+
+### Endpoints
+
+| Endpoint | Description | Example |
+|----------|-------------|---------|
+| `GET /convert/:n` | Number to words | `/convert/42` → `"forty-two"` |
+| `GET /convert/:n?lang=es` | Multi-language | `/convert/42?lang=es` → `"cuarenta y dos"` |
+| `GET /ordinal/:n` | Ordinal words | `/ordinal/3` → `"third"` |
+| `GET /decimal/:n` | Decimal words | `/decimal/3.14` → `"three point one four"` |
+| `GET /currency/:amt` | Currency words | `/currency/$99.99` → `"ninety-nine dollars..."` |
+| `GET /roman/:n` | Roman numerals | `/roman/2024` → `"MMXXIV"` |
+| `GET /parse/:words` | Words to number | `/parse/forty-two` → `42` |
+| `GET /comma/:n` | Format with commas | `/comma/1000000` → `"1,000,000"` |
+| `GET /languages` | List languages | Returns supported language codes |
+
+### Example
+
+```bash
+curl http://localhost:3456/convert/1000000000000000
+# {"input":"1000000000000000","output":"one quadrillion","lang":"en"}
+
+curl "http://localhost:3456/convert/42?lang=fr"
+# {"input":"42","output":"quarante-deux","lang":"fr"}
+```
 
 ## Development
 

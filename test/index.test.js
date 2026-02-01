@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import numberstring, { comma, group, ordinal, decimal, currency, roman, parse, negative, fraction, year, telephone, percent, spanish, french, german, danish, chinese, hindi, russian, toWords } from '../index.js';
+import numberstring, { comma, group, ordinal, decimal, currency, roman, parse, negative, fraction, year, telephone, percent, spanish, french, german, danish, chinese, hindi, russian, portuguese, toWords } from '../index.js';
 
 describe('numberstring', () => {
   describe('basic conversions', () => {
@@ -972,6 +972,64 @@ describe('toWords', () => {
     expect(toWords(42, { lang: 'ru' })).toBe('сорок два');
     expect(toWords(42, { lang: 'russian' })).toBe('сорок два');
     expect(toWords(42, { lang: 'русский' })).toBe('сорок два');
+  });
+
+  it('converts to Portuguese', () => {
+    expect(toWords(42, { lang: 'pt' })).toBe('quarenta e dois');
+    expect(toWords(42, { lang: 'portuguese' })).toBe('quarenta e dois');
+    expect(toWords(42, { lang: 'português' })).toBe('quarenta e dois');
+  });
+});
+
+describe('portuguese', () => {
+  it('converts basic numbers', () => {
+    expect(portuguese(0)).toBe('zero');
+    expect(portuguese(1)).toBe('um');
+    expect(portuguese(10)).toBe('dez');
+    expect(portuguese(15)).toBe('quinze');
+    expect(portuguese(21)).toBe('vinte e um');
+    expect(portuguese(42)).toBe('quarenta e dois');
+  });
+
+  it('converts hundreds', () => {
+    expect(portuguese(100)).toBe('cem');
+    expect(portuguese(101)).toBe('cento e um');
+    expect(portuguese(200)).toBe('duzentos');
+    expect(portuguese(500)).toBe('quinhentos');
+    expect(portuguese(123)).toBe('cento e vinte e três');
+  });
+
+  it('converts thousands', () => {
+    expect(portuguese(1000)).toBe('mil');
+    expect(portuguese(2000)).toBe('dois mil');
+    expect(portuguese(1001)).toBe('mil e um');
+    expect(portuguese(2500)).toBe('dois mil e quinhentos');
+    expect(portuguese(10000)).toBe('dez mil');
+    expect(portuguese(100000)).toBe('cem mil');
+  });
+
+  it('converts millions', () => {
+    expect(portuguese(1000000)).toBe('um milhão');
+    expect(portuguese(2000000)).toBe('dois milhões');
+    expect(portuguese(1500000)).toBe('um milhão e quinhentos mil');
+  });
+
+  it('uses "e" connector between higher scales and thousands', () => {
+    // This is the specific bug fix - "um milhão e mil" not "um milhão mil"
+    expect(portuguese(1001000)).toBe('um milhão e mil');
+    expect(portuguese(2001000)).toBe('dois milhões e mil');
+    expect(portuguese(1002000)).toBe('um milhão e dois mil');
+  });
+
+  it('applies capitalization', () => {
+    expect(portuguese(42, { cap: 'title' })).toBe('Quarenta E Dois');
+    expect(portuguese(42, { cap: 'upper' })).toBe('QUARENTA E DOIS');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(portuguese(-1)).toBe(false);
+    expect(portuguese(NaN)).toBe(false);
+    expect(portuguese('abc')).toBe(false);
   });
 });
 

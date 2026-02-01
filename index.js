@@ -22,7 +22,7 @@
 import { english, spanish, french, german, danish, chinese, hindi, russian, portuguese, LANGUAGES } from './languages/index.js';
 
 // Re-export language functions
-export { spanish, french, german, danish, chinese, hindi, russian };
+export { spanish, french, german, danish, chinese, hindi, russian, portuguese };
 
 // ============================================================================
 // CONSTANTS

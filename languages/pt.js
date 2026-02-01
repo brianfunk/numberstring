@@ -117,10 +117,17 @@ const portuguese = (n, opt) => {
   let result = '';
   for (let i = 0; i < parts.length; i++) {
     if (i > 0) {
-      // Use "e" (and) for connecting in Portuguese
+      const prevPart = parts[i - 1];
       const currPart = parts[i];
-      // Add "e" when the current part is less than 100 or ends with 00
-      if (currPart && !currPart.includes('mil') && !currPart.includes('ilhão') && !currPart.includes('ilhões')) {
+
+      // Use "e" (and) for connecting in Portuguese when:
+      // 1. Current part has no scale word (final small numbers)
+      // 2. Previous part has a higher scale (milhão+) and current part has "mil"
+      const prevHasHigherScale = prevPart && (prevPart.includes('ilhão') || prevPart.includes('ilhões'));
+      const currHasMil = currPart && currPart.includes('mil');
+      const currHasNoScale = currPart && !currHasMil && !currPart.includes('ilhão') && !currPart.includes('ilhões');
+
+      if (currHasNoScale || (prevHasHigherScale && currHasMil)) {
         result += ' e ';
       } else {
         result += ' ';

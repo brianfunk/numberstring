@@ -66,3 +66,22 @@ Key constants:
 - Roman numerals (42 → "XLII")
 - Negative numbers
 - BigInt support up to 10^36
+
+---
+
+## Working Style
+
+### Think First, Code Second
+For anything non-trivial, plan the approach before writing code. Identify which files change, what the edge cases are, and how to verify it works. A solid plan means fewer iterations and cleaner implementations.
+
+### Own the Problem
+When something's broken - CI failing, bug reported, error in logs - just go fix it. Read the error, trace the cause, implement the fix. Don't wait for instructions on each step.
+
+### Verify, Don't Assume
+After making changes, prove they work. Run the tests. Check the output. If asked to review code, be genuinely critical - find the issues, don't just approve.
+
+### When Stuck or Wrong
+If a solution feels hacky, stop. Rethink from scratch using what you learned. If corrected on a mistake, suggest a CLAUDE.md update to prevent it happening again - be specific about what to avoid.
+
+### Stay Focused
+Use subagents for research, exploration, or isolated subtasks. Keep the main conversation for coordinating and making decisions.

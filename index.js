@@ -421,7 +421,7 @@ const parse = (str) => {
   let current = useBigInt ? 0n : 0;
 
   for (const word of words) {
-    if (WORD_VALUES.hasOwnProperty(word)) {
+    if (Object.hasOwn(WORD_VALUES, word)) {
       const val = WORD_VALUES[word];
       if (useBigInt) {
         current += BigInt(val);
@@ -434,7 +434,7 @@ const parse = (str) => {
       } else {
         current *= 100;
       }
-    } else if (SCALE_VALUES.hasOwnProperty(word)) {
+    } else if (Object.hasOwn(SCALE_VALUES, word)) {
       const scale = SCALE_VALUES[word];
       if (useBigInt) {
         const bigScale = typeof scale === 'bigint' ? scale : BigInt(scale);
@@ -570,7 +570,7 @@ const telephone = (phone, opt) => {
 };
 
 const percent = (pct, opt) => {
-  let numStr = String(pct).replace(/%/g, '').trim();
+  const numStr = String(pct).replace(/%/g, '').trim();
   const num = parseFloat(numStr);
 
   if (isNaN(num)) return false;

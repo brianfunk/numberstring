@@ -66,3 +66,25 @@ Key constants:
 - Roman numerals (42 → "XLII")
 - Negative numbers
 - BigInt support up to 10^36
+
+---
+
+## How Claude Should Work
+
+### Planning Before Coding
+For complex tasks, thoroughly plan before writing code. Create a clear implementation plan, identify affected files, and consider edge cases. A well-thought-out plan enables one-shot implementations with fewer iterations.
+
+### Self-Improvement
+When corrected on a mistake, propose an update to this CLAUDE.md file to prevent the same mistake in future sessions. Be specific about what went wrong and how to avoid it.
+
+### Autonomous Problem Solving
+When asked to fix bugs or failing tests, investigate independently. Check CI logs, read error messages, trace the issue, and fix it without requiring step-by-step guidance. Use subagents for complex multi-file investigations to keep the main context focused.
+
+### Code Review Mindset
+When asked to review changes, be critical and thorough. Identify potential issues, suggest improvements, and verify the solution actually works. Don't just rubber-stamp changes - challenge assumptions and prove correctness.
+
+### Iterative Refinement
+If an initial solution feels hacky or overly complex, step back and reconsider. Sometimes the best approach is to scrap a mediocre implementation and design a cleaner solution from scratch, using everything learned from the first attempt.
+
+### Context Efficiency
+Offload discrete subtasks to subagents to preserve main context for high-level coordination. This is especially useful for research, file exploration, and isolated fixes that don't need full conversation history.

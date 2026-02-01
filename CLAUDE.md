@@ -32,15 +32,37 @@ Key constants:
 
 ## When Making Changes
 
-1. Ensure all tests pass: `npm test`
+1. **ALWAYS run lint and tests before committing**: `npm run lint && npm test`
 2. Maintain 100% coverage: `npm run test:coverage`
-3. Run linter: `npm run lint`
-4. Update CHANGELOG.md for any user-facing changes
-5. Preserve the fun flair (ASCII art header, tagline)
+3. Update CHANGELOG.md for any user-facing changes
+4. Preserve the fun flair (ASCII art header, tagline)
 
-## Known Limitations
+## PR Review Workflow
 
-- Maximum supported number: `Number.MAX_SAFE_INTEGER` (9,007,199,254,740,991)
-- No decimal support
-- English only
-- No ordinal support (1st, 2nd, 3rd)
+- Always check GitHub PR comments before continuing work
+- Review feedback from Codex, human reviewers, and CI systems
+- Fix valid issues before pushing new commits
+- Use `gh pr view <number> --comments` to fetch PR comments
+
+## Supported Languages
+
+- English (default)
+- Spanish (`es`, `spanish`, `español`)
+- French (`fr`, `french`, `français`)
+- German (`de`, `german`, `deutsch`)
+- Danish (`da`, `danish`, `dansk`)
+- Chinese (`zh`, `chinese`, `中文`)
+- Hindi (`hi`, `hindi`, `हिन्दी`)
+- Russian (`ru`, `russian`, `русский`)
+- Portuguese (`pt`, `portuguese`, `português`)
+
+## Features
+
+- Number to words (cardinal)
+- Ordinals (1st, 2nd, 3rd)
+- Decimals (3.14 → "three point one four")
+- Currency ($1.23 → "one dollar and twenty-three cents")
+- Fractions (1/2 → "one half")
+- Roman numerals (42 → "XLII")
+- Negative numbers
+- BigInt support up to 10^36

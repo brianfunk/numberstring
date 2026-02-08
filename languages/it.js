@@ -35,6 +35,11 @@ const tenment = (n, g) => hundment(n, g) % 100;
 const hundredIt = (n) => {
   if (n < 100 || n >= 1000) return '';
   const h = Math.floor(n / 100);
+  const remainder = n % 100;
+  // Elision: drop trailing 'o' before otto (8) and ottanta (80-89)
+  if (remainder >= 80 && remainder <= 89 || remainder === 8) {
+    return IT_HUNDREDS[h].slice(0, -1);
+  }
   return IT_HUNDREDS[h];
 };
 

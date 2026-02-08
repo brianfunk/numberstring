@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **8 Language Support** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian
+- **9 Language Support** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian, Portuguese
   - Modular language files in `languages/` folder for easy community contributions
   - `toWords(n, { lang: 'es' })` for multi-language conversion
 - **New Functions**

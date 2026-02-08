@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-02-08
+
+### Added
+
+- **13 New Languages** - Japanese (`ja`), Korean (`ko`), Arabic (`ar`), Italian (`it`), Dutch (`nl`), Turkish (`tr`), Polish (`pl`), Swedish (`sv`), Indonesian (`id`), Thai (`th`), Norwegian (`no`), Finnish (`fi`), Icelandic (`is`)
+  - Total language support now at 22 languages
+  - Full Scandinavian coverage: Danish, Swedish, Norwegian, Finnish, Icelandic
+  - All new languages support BigInt up to 10^36
+- 49 new tests for all new languages (265 total)
+
 ## [1.0.0] - 2026-02-01
 
 ### Breaking Changes

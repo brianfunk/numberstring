@@ -14,15 +14,15 @@
 
 /**
  * numberstring - Convert numbers to their word representation
- * Supports English, Spanish, French, German, Danish, Mandarin Chinese, Hindi, Russian, and Portuguese
+ * Supports 22 languages including English, Spanish, French, German, Danish, Chinese, Hindi, Russian, Portuguese, Japanese, Korean, Arabic, Italian, Dutch, Turkish, Polish, Swedish, Indonesian, Thai, Norwegian, Finnish, and Icelandic
  * @module numberstring
  */
 
 // Import language functions
-import { english, spanish, french, german, danish, chinese, hindi, russian, portuguese, LANGUAGES } from './languages/index.js';
+import { english, spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic, LANGUAGES } from './languages/index.js';
 
 // Re-export language functions
-export { spanish, french, german, danish, chinese, hindi, russian, portuguese };
+export { spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic };
 
 // ============================================================================
 // CONSTANTS
@@ -597,7 +597,7 @@ const percent = (pct, opt) => {
  * Convert a number to words in a specified language
  * @param {number|bigint} n - The number to convert
  * @param {Object} [opt] - Options object
- * @param {string} [opt.lang] - Language code: 'en', 'es', 'fr', 'de', 'da', 'zh', 'hi', 'ru'
+ * @param {string} [opt.lang] - Language code: 'en', 'es', 'fr', 'de', 'da', 'zh', 'hi', 'ru', 'pt', 'ja', 'ko', 'ar', 'it', 'nl', 'tr', 'pl', 'sv', 'id', 'th', 'no', 'fi', 'is'
  * @returns {string|false} The word representation
  */
 const toWords = (n, opt) => {
@@ -632,6 +632,45 @@ const toWords = (n, opt) => {
       break;
     case 'portuguese':
       result = portuguese(n);
+      break;
+    case 'japanese':
+      result = japanese(n);
+      break;
+    case 'korean':
+      result = korean(n);
+      break;
+    case 'arabic':
+      result = arabic(n);
+      break;
+    case 'italian':
+      result = italian(n);
+      break;
+    case 'dutch':
+      result = dutch(n);
+      break;
+    case 'turkish':
+      result = turkish(n);
+      break;
+    case 'polish':
+      result = polish(n);
+      break;
+    case 'swedish':
+      result = swedish(n);
+      break;
+    case 'indonesian':
+      result = indonesian(n);
+      break;
+    case 'thai':
+      result = thai(n);
+      break;
+    case 'norwegian':
+      result = norwegian(n);
+      break;
+    case 'finnish':
+      result = finnish(n);
+      break;
+    case 'icelandic':
+      result = icelandic(n);
       break;
     default:
       result = english(n);

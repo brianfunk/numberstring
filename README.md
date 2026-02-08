@@ -11,16 +11,16 @@
 
 > Number One Way to Makes Words from Numbers
 
-Transform any number into beautiful words. From `42` to `"forty-two"`, from `1000000` to `"one million"`. Supports **8 languages**, ordinals, currency, Roman numerals, and more!
+Transform any number into beautiful words. From `42` to `"forty-two"`, from `1000000` to `"one million"`. Supports **22 languages**, ordinals, currency, Roman numerals, and more!
 
 ## Why numberstring?
 
 - **Zero dependencies** - Lightweight and fast
-- **9 languages** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian, Portuguese
+- **22 languages** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian, Portuguese, Japanese, Korean, Arabic, Italian, Dutch, Turkish, Polish, Swedish, Indonesian, Thai, Norwegian, Finnish, Icelandic
 - **Huge range** - Supports 0 to decillions (10^36) with BigInt
 - **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers
 - **Roman numerals** - Convert to and from Roman numerals
-- **Well tested** - 216 tests with 90%+ coverage
+- **Well tested** - 265 tests with 90%+ coverage
 - **Modern ES modules** - Tree-shakeable, TypeScript-friendly
 
 ## Installation
@@ -191,10 +191,10 @@ comma(1234567);  // '1,234,567'
 
 ## Multi-Language Support
 
-numberstring supports 9 languages! Each language is in a separate file for easy tree-shaking.
+numberstring supports 22 languages! Each language is in a separate file for easy tree-shaking.
 
 ```javascript
-import { toWords, spanish, french, german, danish, chinese, hindi, russian, portuguese } from 'numberstring';
+import { toWords } from 'numberstring';
 
 // Using toWords with lang option
 toWords(42, { lang: 'es' });  // 'cuarenta y dos'
@@ -205,15 +205,47 @@ toWords(42, { lang: 'zh' });  // '四十二'
 toWords(42, { lang: 'hi' });  // 'बयालीस'
 toWords(42, { lang: 'ru' });  // 'сорок два'
 toWords(42, { lang: 'pt' });  // 'quarenta e dois'
-
-// Or use language functions directly
-spanish(1000);    // 'mil'
-french(80);       // 'quatre-vingts'
-german(21);       // 'einundzwanzig'
-chinese(10000);   // '一万'
-russian(2000);    // 'две тысячи'
-portuguese(100);  // 'cem'
+toWords(42, { lang: 'ja' });  // '四十二'
+toWords(42, { lang: 'ko' });  // '사십이'
+toWords(42, { lang: 'ar' });  // 'اثنان وأربعون'
+toWords(42, { lang: 'it' });  // 'quarantadue'
+toWords(42, { lang: 'nl' });  // 'tweeënveertig'
+toWords(42, { lang: 'tr' });  // 'kırk iki'
+toWords(42, { lang: 'pl' });  // 'czterdzieści dwa'
+toWords(42, { lang: 'sv' });  // 'fyrtiotvå'
+toWords(42, { lang: 'id' });  // 'empat puluh dua'
+toWords(42, { lang: 'th' });  // 'สี่สิบสอง'
+toWords(42, { lang: 'no' });  // 'førtito'
+toWords(42, { lang: 'fi' });  // 'neljäkymmentäkaksi'
+toWords(42, { lang: 'is' });  // 'fjörutíu og tveir'
 ```
+
+### Supported Languages
+
+| Code | Language | Example (42) |
+|------|----------|-------------|
+| `en` | English | forty-two |
+| `es` | Spanish | cuarenta y dos |
+| `fr` | French | quarante-deux |
+| `de` | German | zweiundvierzig |
+| `da` | Danish | toogfyrre |
+| `zh` | Chinese | 四十二 |
+| `hi` | Hindi | बयालीस |
+| `ru` | Russian | сорок два |
+| `pt` | Portuguese | quarenta e dois |
+| `ja` | Japanese | 四十二 |
+| `ko` | Korean | 사십이 |
+| `ar` | Arabic | اثنان وأربعون |
+| `it` | Italian | quarantadue |
+| `nl` | Dutch | tweeënveertig |
+| `tr` | Turkish | kırk iki |
+| `pl` | Polish | czterdzieści dwa |
+| `sv` | Swedish | fyrtiotvå |
+| `id` | Indonesian | empat puluh dua |
+| `th` | Thai | สี่สิบสอง |
+| `no` | Norwegian | førtito |
+| `fi` | Finnish | neljäkymmentäkaksi |
+| `is` | Icelandic | fjörutíu og tveir |
 
 ### Adding a New Language
 

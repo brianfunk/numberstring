@@ -20,6 +20,19 @@ import chinese from './zh.js';
 import hindi from './hi.js';
 import russian from './ru.js';
 import portuguese from './pt.js';
+import japanese from './ja.js';
+import korean from './ko.js';
+import arabic from './ar.js';
+import italian from './it.js';
+import dutch from './nl.js';
+import turkish from './tr.js';
+import polish from './pl.js';
+import swedish from './sv.js';
+import indonesian from './id.js';
+import thai from './th.js';
+import norwegian from './no.js';
+import finnish from './fi.js';
+import icelandic from './is.js';
 
 /** Supported language codes and aliases */
 const LANGUAGES = Object.freeze({
@@ -49,7 +62,46 @@ const LANGUAGES = Object.freeze({
   'русский': 'russian',
   pt: 'portuguese',
   portuguese: 'portuguese',
-  português: 'portuguese'
+  português: 'portuguese',
+  ja: 'japanese',
+  japanese: 'japanese',
+  '日本語': 'japanese',
+  ko: 'korean',
+  korean: 'korean',
+  '한국어': 'korean',
+  ar: 'arabic',
+  arabic: 'arabic',
+  'العربية': 'arabic',
+  it: 'italian',
+  italian: 'italian',
+  italiano: 'italian',
+  nl: 'dutch',
+  dutch: 'dutch',
+  nederlands: 'dutch',
+  tr: 'turkish',
+  turkish: 'turkish',
+  türkçe: 'turkish',
+  pl: 'polish',
+  polish: 'polish',
+  polski: 'polish',
+  sv: 'swedish',
+  swedish: 'swedish',
+  svenska: 'swedish',
+  id: 'indonesian',
+  indonesian: 'indonesian',
+  'bahasa indonesia': 'indonesian',
+  th: 'thai',
+  thai: 'thai',
+  'ไทย': 'thai',
+  no: 'norwegian',
+  norwegian: 'norwegian',
+  norsk: 'norwegian',
+  fi: 'finnish',
+  finnish: 'finnish',
+  suomi: 'finnish',
+  is: 'icelandic',
+  icelandic: 'icelandic',
+  íslenska: 'icelandic'
 });
 
 export {
@@ -62,5 +114,18 @@ export {
   hindi,
   russian,
   portuguese,
+  japanese,
+  korean,
+  arabic,
+  italian,
+  dutch,
+  turkish,
+  polish,
+  swedish,
+  indonesian,
+  thai,
+  norwegian,
+  finnish,
+  icelandic,
   LANGUAGES
 };

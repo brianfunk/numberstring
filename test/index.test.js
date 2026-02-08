@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import numberstring, { comma, group, ordinal, decimal, currency, roman, parse, negative, fraction, year, telephone, percent, spanish, french, german, danish, chinese, hindi, russian, portuguese, toWords } from '../index.js';
+import numberstring, { comma, group, ordinal, decimal, currency, roman, parse, negative, fraction, year, telephone, percent, spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic, toWords } from '../index.js';
 
 describe('numberstring', () => {
   describe('basic conversions', () => {
@@ -1095,5 +1095,340 @@ describe('group', () => {
 
   it('returns 5 for quadrillions', () => {
     expect(group(1000000000000000)).toBe(5);
+  });
+});
+
+// ============================================================================
+// NEW LANGUAGE TESTS
+// ============================================================================
+
+describe('japanese', () => {
+  it('converts basic numbers', () => {
+    expect(japanese(0)).toBe('ゼロ');
+    expect(japanese(1)).toBe('一');
+    expect(japanese(10)).toBe('十');
+    expect(japanese(42)).toBe('四十二');
+    expect(japanese(100)).toBe('百');
+    expect(japanese(1000)).toBe('千');
+  });
+
+  it('converts large numbers', () => {
+    expect(japanese(10000)).toBe('一万');
+    expect(japanese(12345)).toBe('一万二千三百四十五');
+    expect(japanese(100000000)).toBe('一億');
+    expect(japanese(1000000000000)).toBe('一兆');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(japanese(-1)).toBe(false);
+    expect(japanese(NaN)).toBe(false);
+    expect(japanese('abc')).toBe(false);
+  });
+});
+
+describe('korean', () => {
+  it('converts basic numbers', () => {
+    expect(korean(0)).toBe('영');
+    expect(korean(1)).toBe('일');
+    expect(korean(10)).toBe('십');
+    expect(korean(42)).toBe('사십이');
+    expect(korean(100)).toBe('백');
+    expect(korean(1000)).toBe('천');
+  });
+
+  it('converts large numbers', () => {
+    expect(korean(10000)).toBe('일만');
+    expect(korean(12345)).toBe('일만이천삼백사십오');
+    expect(korean(100000000)).toBe('일억');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(korean(-1)).toBe(false);
+    expect(korean(NaN)).toBe(false);
+  });
+});
+
+describe('arabic', () => {
+  it('converts basic numbers', () => {
+    expect(arabic(0)).toBe('صفر');
+    expect(arabic(1)).toBe('واحد');
+    expect(arabic(2)).toBe('اثنان');
+    expect(arabic(10)).toBe('عشرة');
+    expect(arabic(11)).toBe('أحد عشر');
+  });
+
+  it('converts tens with ones (ones before tens)', () => {
+    expect(arabic(21)).toContain('واحد');
+    expect(arabic(21)).toContain('عشرون');
+    expect(arabic(42)).toContain('اثنان');
+    expect(arabic(42)).toContain('أربعون');
+  });
+
+  it('converts thousands', () => {
+    expect(arabic(1000)).toBe('ألف');
+    expect(arabic(2000)).toBe('ألفان');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(arabic(-1)).toBe(false);
+    expect(arabic(NaN)).toBe(false);
+  });
+});
+
+describe('italian', () => {
+  it('converts basic numbers', () => {
+    expect(italian(0)).toBe('zero');
+    expect(italian(1)).toBe('uno');
+    expect(italian(10)).toBe('dieci');
+    expect(italian(11)).toBe('undici');
+    expect(italian(42)).toBe('quarantadue');
+  });
+
+  it('handles elision rules', () => {
+    expect(italian(21)).toBe('ventuno');
+    expect(italian(28)).toBe('ventotto');
+    expect(italian(23)).toBe('ventitré');
+  });
+
+  it('converts thousands', () => {
+    expect(italian(1000)).toBe('mille');
+    expect(italian(2000)).toBe('duemila');
+  });
+
+  it('converts millions', () => {
+    expect(italian(1000000)).toBe('un milione');
+    expect(italian(2000000)).toBe('due milioni');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(italian(-1)).toBe(false);
+    expect(italian(NaN)).toBe(false);
+  });
+});
+
+describe('dutch', () => {
+  it('converts basic numbers', () => {
+    expect(dutch(0)).toBe('nul');
+    expect(dutch(1)).toBe('een');
+    expect(dutch(10)).toBe('tien');
+    expect(dutch(12)).toBe('twaalf');
+  });
+
+  it('reverses ones and tens', () => {
+    expect(dutch(21)).toBe('eenentwintig');
+    expect(dutch(42)).toBe('tweeënveertig');
+    expect(dutch(99)).toBe('negenennegent\u0069g');
+  });
+
+  it('converts thousands', () => {
+    expect(dutch(1000)).toBe('duizend');
+    expect(dutch(2000)).toBe('tweeduizend');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(dutch(-1)).toBe(false);
+    expect(dutch(NaN)).toBe(false);
+  });
+});
+
+describe('turkish', () => {
+  it('converts basic numbers', () => {
+    expect(turkish(0)).toBe('sıfır');
+    expect(turkish(1)).toBe('bir');
+    expect(turkish(42)).toBe('kırk iki');
+    expect(turkish(100)).toBe('yüz');
+  });
+
+  it('omits bir before yüz and bin', () => {
+    expect(turkish(100)).toBe('yüz');
+    expect(turkish(1000)).toBe('bin');
+  });
+
+  it('includes bir before milyon', () => {
+    expect(turkish(1000000)).toBe('bir milyon');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(turkish(-1)).toBe(false);
+    expect(turkish(NaN)).toBe(false);
+  });
+});
+
+describe('polish', () => {
+  it('converts basic numbers', () => {
+    expect(polish(0)).toBe('zero');
+    expect(polish(1)).toBe('jeden');
+    expect(polish(42)).toBe('czterdzieści dwa');
+  });
+
+  it('handles plural forms', () => {
+    expect(polish(1000)).toBe('tysiąc');
+    expect(polish(2000)).toContain('tysiące');
+    expect(polish(5000)).toContain('tysięcy');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(polish(-1)).toBe(false);
+    expect(polish(NaN)).toBe(false);
+  });
+});
+
+describe('swedish', () => {
+  it('converts basic numbers', () => {
+    expect(swedish(0)).toBe('noll');
+    expect(swedish(1)).toBe('en');
+    expect(swedish(42)).toBe('fyrtiotvå');
+  });
+
+  it('converts thousands', () => {
+    expect(swedish(1000)).toBe('ettusen');
+    expect(swedish(2000)).toContain('tusen');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(swedish(-1)).toBe(false);
+    expect(swedish(NaN)).toBe(false);
+  });
+});
+
+describe('indonesian', () => {
+  it('converts basic numbers', () => {
+    expect(indonesian(0)).toBe('nol');
+    expect(indonesian(1)).toBe('satu');
+    expect(indonesian(11)).toBe('sebelas');
+    expect(indonesian(42)).toBe('empat puluh dua');
+  });
+
+  it('uses se- prefix', () => {
+    expect(indonesian(100)).toBe('seratus');
+    expect(indonesian(1000)).toBe('seribu');
+  });
+
+  it('uses satu for million', () => {
+    expect(indonesian(1000000)).toBe('satu juta');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(indonesian(-1)).toBe(false);
+    expect(indonesian(NaN)).toBe(false);
+  });
+});
+
+describe('thai', () => {
+  it('converts basic numbers', () => {
+    expect(thai(0)).toBe('ศูนย์');
+    expect(thai(1)).toBe('หนึ่ง');
+    expect(thai(11)).toBe('สิบเอ็ด');
+    expect(thai(20)).toBe('ยี่สิบ');
+    expect(thai(21)).toBe('ยี่สิบเอ็ด');
+    expect(thai(42)).toBe('สี่สิบสอง');
+  });
+
+  it('converts thousands', () => {
+    expect(thai(1000)).toBe('หนึ่งพัน');
+    expect(thai(10000)).toBe('หนึ่งหมื่น');
+    expect(thai(100000)).toBe('หนึ่งแสน');
+  });
+
+  it('converts millions', () => {
+    expect(thai(1000000)).toBe('หนึ่งล้าน');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(thai(-1)).toBe(false);
+    expect(thai(NaN)).toBe(false);
+  });
+});
+
+describe('norwegian', () => {
+  it('converts basic numbers', () => {
+    expect(norwegian(0)).toBe('null');
+    expect(norwegian(1)).toBe('en');
+    expect(norwegian(42)).toBe('førtito');
+  });
+
+  it('converts thousands', () => {
+    expect(norwegian(1000)).toBe('ettusen');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(norwegian(-1)).toBe(false);
+    expect(norwegian(NaN)).toBe(false);
+  });
+});
+
+describe('finnish', () => {
+  it('converts basic numbers', () => {
+    expect(finnish(0)).toBe('nolla');
+    expect(finnish(1)).toBe('yksi');
+    expect(finnish(42)).toBe('neljäkymmentäkaksi');
+  });
+
+  it('converts hundreds and thousands', () => {
+    expect(finnish(100)).toBe('sata');
+    expect(finnish(200)).toContain('sataa');
+    expect(finnish(1000)).toBe('tuhat');
+    expect(finnish(2000)).toContain('tuhatta');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(finnish(-1)).toBe(false);
+    expect(finnish(NaN)).toBe(false);
+  });
+});
+
+describe('icelandic', () => {
+  it('converts basic numbers', () => {
+    expect(icelandic(0)).toBe('núll');
+    expect(icelandic(1)).toBe('einn');
+    expect(icelandic(42)).toBe('fjörutíu og tveir');
+  });
+
+  it('converts thousands', () => {
+    expect(icelandic(1000)).toBe('eitt þúsund');
+  });
+
+  it('returns false for invalid input', () => {
+    expect(icelandic(-1)).toBe(false);
+    expect(icelandic(NaN)).toBe(false);
+  });
+});
+
+describe('toWords with new languages', () => {
+  it('converts using language codes', () => {
+    expect(toWords(42, { lang: 'ja' })).toBe('四十二');
+    expect(toWords(42, { lang: 'ko' })).toBe('사십이');
+    expect(toWords(42, { lang: 'it' })).toBe('quarantadue');
+    expect(toWords(42, { lang: 'nl' })).toBe('tweeënveertig');
+    expect(toWords(42, { lang: 'tr' })).toBe('kırk iki');
+    expect(toWords(42, { lang: 'pl' })).toBe('czterdzieści dwa');
+    expect(toWords(42, { lang: 'sv' })).toBe('fyrtiotvå');
+    expect(toWords(42, { lang: 'id' })).toBe('empat puluh dua');
+    expect(toWords(42, { lang: 'no' })).toBe('førtito');
+    expect(toWords(42, { lang: 'fi' })).toBe('neljäkymmentäkaksi');
+    expect(toWords(42, { lang: 'is' })).toBe('fjörutíu og tveir');
+  });
+
+  it('converts using language names', () => {
+    expect(toWords(42, { lang: 'japanese' })).toBe('四十二');
+    expect(toWords(42, { lang: 'korean' })).toBe('사십이');
+    expect(toWords(42, { lang: 'italian' })).toBe('quarantadue');
+    expect(toWords(42, { lang: 'dutch' })).toBe('tweeënveertig');
+    expect(toWords(42, { lang: 'turkish' })).toBe('kırk iki');
+    expect(toWords(42, { lang: 'polish' })).toBe('czterdzieści dwa');
+    expect(toWords(42, { lang: 'swedish' })).toBe('fyrtiotvå');
+    expect(toWords(42, { lang: 'indonesian' })).toBe('empat puluh dua');
+    expect(toWords(42, { lang: 'norwegian' })).toBe('førtito');
+    expect(toWords(42, { lang: 'finnish' })).toBe('neljäkymmentäkaksi');
+    expect(toWords(42, { lang: 'icelandic' })).toBe('fjörutíu og tveir');
+  });
+
+  it('converts using native language names', () => {
+    expect(toWords(42, { lang: '日本語' })).toBe('四十二');
+    expect(toWords(42, { lang: '한국어' })).toBe('사십이');
+    expect(toWords(42, { lang: 'italiano' })).toBe('quarantadue');
+    expect(toWords(42, { lang: 'türkçe' })).toBe('kırk iki');
+    expect(toWords(42, { lang: 'suomi' })).toBe('neljäkymmentäkaksi');
+    expect(toWords(42, { lang: 'íslenska' })).toBe('fjörutíu og tveir');
   });
 });

@@ -14,7 +14,7 @@
 
 /**
  * numberstring - Convert numbers to their word representation
- * Supports English, Spanish, French, German, Danish, Mandarin Chinese, Hindi, and Russian
+ * Supports English, Spanish, French, German, Danish, Mandarin Chinese, Hindi, Russian, and Portuguese
  * @module numberstring
  */
 

@@ -20,7 +20,7 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Huge range** - Supports 0 to decillions (10^36) with BigInt
 - **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers
 - **Roman numerals** - Convert to and from Roman numerals
-- **Well tested** - 174 tests with 90%+ coverage
+- **Well tested** - 216 tests with 90%+ coverage
 - **Modern ES modules** - Tree-shakeable, TypeScript-friendly
 
 ## Installation

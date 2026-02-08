@@ -1184,10 +1184,20 @@ describe('italian', () => {
     expect(italian(42)).toBe('quarantadue');
   });
 
-  it('handles elision rules', () => {
+  it('handles tens elision rules', () => {
     expect(italian(21)).toBe('ventuno');
     expect(italian(28)).toBe('ventotto');
     expect(italian(23)).toBe('ventitré');
+  });
+
+  it('handles cento elision before otto/ottanta', () => {
+    expect(italian(108)).toBe('centotto');
+    expect(italian(180)).toBe('centottanta');
+    expect(italian(188)).toBe('centottantotto');
+    expect(italian(208)).toBe('duecentotto');
+    expect(italian(280)).toBe('duecentottanta');
+    expect(italian(808)).toBe('ottocentotto');
+    expect(italian(880)).toBe('ottocentottanta');
   });
 
   it('converts thousands', () => {

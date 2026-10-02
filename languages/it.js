@@ -105,6 +105,8 @@ const italian = (n) => {
           if (h >= 100) s += hundredIt(h);
           const t = tenment(num, i);
           if (t > 0) s += tenIt(t);
+          // "-uno" elides before mila: ventunmila, trentunmila
+          s = s.replace(/(ant|ent)uno$/, '$1un');
           s += 'mila';
         }
       } else {

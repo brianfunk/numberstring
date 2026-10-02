@@ -16,7 +16,7 @@ const MAX_VALUE = 10n ** 36n - 1n;
  * @param {number} grp - The group value (0-9999)
  * @returns {string} The Japanese representation
  */
-const groupToJa = (grp) => {
+const groupToJa = (grp, afterScale = false) => {
   if (grp === 0) return '';
 
   const thousands = Math.floor(grp / 1000);
@@ -26,9 +26,10 @@ const groupToJa = (grp) => {
 
   let result = '';
 
-  // Thousands: 1 before 千 is omitted
+  // Thousands: 1 before 千 is omitted at the start (千) but kept after a
+  // higher scale word (二万一千)
   if (thousands > 0) {
-    if (thousands === 1) {
+    if (thousands === 1 && !afterScale) {
       result += '千';
     } else {
       result += JA_DIGITS[thousands] + '千';
@@ -105,7 +106,7 @@ const japanese = (n) => {
 
     if (grp === 0) continue;
 
-    const grpStr = groupToJa(grp);
+    const grpStr = groupToJa(grp, i > 0);
 
     // 1 before 万 and above IS included (handled naturally by groupToJa
     // since grp=1 produces '一' for the ones digit in the group)

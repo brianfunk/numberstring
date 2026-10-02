@@ -21,7 +21,7 @@ const tenment = (n, g) => hundment(n, g) % 100;
 const hundredEs = (n) => {
   if (n < 100 || n >= 1000) return '';
   const h = Math.floor(n / 100);
-  if (h === 1) return 'ciento ';
+  if (h === 1) return n === 100 ? 'cien ' : 'ciento ';
   if (h === 5) return 'quinientos ';
   if (h === 7) return 'setecientos ';
   if (h === 9) return 'novecientos ';
@@ -88,8 +88,11 @@ const spanish = (n, opt) => {
         if (h === 1 && i === 1) {
           s += 'mil ';
         } else {
-          s += hundredEs(h);
-          s += tenEs(tenment(num, i));
+          // "uno" apocopates to "un" before a scale word: un millón, veintiún mil
+          const groupWords = (hundredEs(h) + tenEs(tenment(num, i)))
+            .replace(/veintiuno $/, 'veintiún ')
+            .replace(/uno $/, 'un ');
+          s += groupWords;
           const illionWord = h === 1 ? ES_ILLIONS[i] : ES_ILLIONS_PLURAL[i];
           s += `${illionWord} `;
         }

@@ -84,10 +84,15 @@ const french = (n) => {
         s += tenFr(tenment(num, i));
       } else if (i === 1 && h === 1) {
         s += 'mille ';
+      } else if (i === 1) {
+        // "cents" and "quatre-vingts" lose their plural s before "mille"
+        const groupWords = (hundredFr(h) + tenFr(tenment(num, i))).replace(/(cent|vingt)s $/, '$1 ');
+        s += `${groupWords}mille `;
       } else {
         s += hundredFr(h);
         s += tenFr(tenment(num, i));
-        s += `${FR_ILLIONS[i]} `;
+        // million, milliard, etc. are nouns and take a plural s
+        s += h > 1 ? `${FR_ILLIONS[i]}s ` : `${FR_ILLIONS[i]} `;
       }
     }
   }

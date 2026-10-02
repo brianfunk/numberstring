@@ -50,7 +50,7 @@ Key constants:
 - `index.js` - core English conversion plus all public helpers; `numberstring()` is forgiving and delegates to `negative()`, `decimal()`, `toWords()`
 - `languages/` - one module per language, cardinals only, non-negative integers only
 - `test/languages.test.js` - per-language spot-check table; update expectations when fixing a language
-- `site/` - static playground deployed to Netlify (`netlify.toml`); `scripts/build-site.js` copies the library into `site/lib/`
+- `site/` - static playground deployed to Netlify (`netlify.toml`); `scripts/build-site.js` copies the library into `site/lib/`. `og.png` is the social preview; after editing `og.svg` run `npm run site:og` to re-render it
 - `archive/server/` - old Express API, unmaintained, excluded from tests and lint; do not extend it
 
 ## Supported Languages

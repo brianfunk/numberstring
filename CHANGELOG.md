@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-02
+
+### Added
+
+- **Forgiving default export** - `numberstring()` now accepts negatives, decimals, numeric strings, and a `lang` option, delegating to `negative()`, `decimal()`, and `toWords()`. Invalid input still returns `false`.
+- **Playground** - Static site in `site/` deployed to Netlify. Type a number, see it in 22 languages plus ordinal, Roman, year, currency, and more.
+- **Per-language spot-check tests** - `test/languages.test.js` locks in tricky numbers (21, 71, 80, 91, 100, 101, 1000, 1001, 2000, 21000, 1M, 2M, 21M) for all 22 languages.
+- `npm run site` and `npm run site:build` scripts.
+
+### Fixed
+
+- Spanish: `100` is now `cien` (was `ciento`); `uno` apocopates before scale words (`un millón`, `veintiún mil`, `ciento un millones`).
+- French: `million`/`milliard` pluralize (`deux millions`); `cents` and `quatre-vingts` drop the `s` before `mille` (`deux cent mille`).
+- Italian: `-uno` elides before `mila` (`ventunmila`).
+- Japanese: `一千` is kept after a higher scale word (`二万一千`, was `二万千`).
+- Icelandic: gender agreement for 1–4 before `hundrað`/`þúsund` (neuter: `tvö þúsund`), `milljón` (feminine: `ein milljón`, `tvær milljónir`), and singular after numbers ending in 1 (`tuttugu og ein milljón`).
+- `decimal(1e21)` returned `"one"`; exponent-form integers are now expanded, exponent-form fractions return `false`.
+- `decimal()` kept only 15 digits of precision for long integer parts in strings.
+- `parse('nineteen eighty-four')` returned `103`; adjacent simple words other than tens + ones now return `false`.
+
+### Changed
+
+- The Express REST server moved to `archive/server/` and is no longer tested, linted, or maintained. The playground supersedes it.
+- Removed `express` and `supertest` from devDependencies.
+
 ## [1.0.1] - 2026-02-08
 
 ### Added

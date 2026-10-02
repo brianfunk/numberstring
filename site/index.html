@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>numberstring</title>
+  <meta name="description" content="Turn any number into words. 22 languages, ordinals, Roman numerals, decimals, currency, and BigInt up to decillions. Zero dependencies, runs in your browser.">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔢</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <pre class="ascii" aria-hidden="true">
+                      /##                                       /""               /""
+                     | ##                                      | ""              |__/
+ /#######  /##   /##  #######   /######   /######   /""""""" /""""""    /""""""  /"" /"""""""   /""""""
+| ##__  ##| ##  | ##| ##__  ## /##__  ## /##__  ## /""_____/|_  ""_/   /""__  ""| ""| ""__  "" /""__  ""
+| ##  \ ##| ##  | ##| ##  \ ##| ########| ##  \__/|  """"""   | ""    | ""  \__/| ""| ""  \ ""| ""  \ ""
+| ##  | ##| ##  | ##| ##  | ##| ##_____/| ##       \____  ""  | "" /""| ""      | ""| ""  | ""| ""  | ""
+| ##  | ##|  ######/| #######/|  #######| ##       /"""""""/  |  """"/| ""      | ""| ""  | ""|  """""""
+|__/  |__/ \______/ |_______/  \_______/|__/      |_______/    \___/  |__/      |__/|__/  |__/ \____  ""
+                                                                                                /""  \ ""
+                                                                                               |  """"""/
+                                                                                                \______/</pre>
+      <h1>numberstring</h1>
+      <p class="tagline">Number One Way to Makes Words from Numbers</p>
+    </header>
+
+    <section class="input-row">
+      <label for="n" class="visually-hidden">Number</label>
+      <input id="n" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"
+             placeholder="type a number" value="42" autofocus>
+      <div class="chips" role="group" aria-label="Examples">
+        <button type="button" data-n="42">42</button>
+        <button type="button" data-n="1984">1984</button>
+        <button type="button" data-n="-3.14">-3.14</button>
+        <button type="button" data-n="8675309">8675309</button>
+        <button type="button" data-n="1000000000000000000000">10<sup>21</sup></button>
+        <button type="button" data-n="999999999999999999999999999999999999">10<sup>36</sup>−1</button>
+      </div>
+    </section>
+
+    <section class="hero" aria-live="polite">
+      <p id="english" class="english">forty-two</p>
+      <p id="error" class="error" hidden></p>
+    </section>
+
+    <section class="facts">
+      <h2>Also</h2>
+      <dl id="facts"></dl>
+    </section>
+
+    <section class="languages">
+      <h2>In 22 languages</h2>
+      <table>
+        <tbody id="langs"></tbody>
+      </table>
+    </section>
+
+    <footer>
+      <p>
+        <code>npm install numberstring</code>
+        · <a href="https://www.npmjs.com/package/numberstring">npm</a>
+        · <a href="https://github.com/brianfunk/numberstring">GitHub</a>
+        · zero dependencies, runs entirely in your browser
+      </p>
+      <p class="footnote">### # " "</p>
+    </footer>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

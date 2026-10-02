@@ -147,14 +147,13 @@ const comma = (n) => {
 // ============================================================================
 
 /**
- * Convert a number or BigInt to its English word representation
+ * Convert a non-negative integer (number or BigInt) to English words.
+ * Internal: the public `string()` normalizes input and delegates here.
  * @param {number|bigint} n - The number to convert (0 to 10^36-1)
  * @param {Object} [opt] - Options object
- * @param {string} [opt.cap] - Capitalization: 'title', 'upper', or 'lower'
- * @param {string} [opt.punc] - Punctuation: '!', '?', or '.'
  * @returns {string|false} The word representation or false if invalid
  */
-const string = (n, opt) => {
+const cardinal = (n, opt) => {
   let num;
 
   if (typeof n === 'bigint') {
@@ -192,6 +191,65 @@ const string = (n, opt) => {
   return s;
 };
 
+/**
+ * Convert a number to its word representation.
+ *
+ * Forgiving by design: accepts integers, negatives, decimals, numeric strings,
+ * and BigInt, and honors `opt.lang` for any of the 22 supported languages.
+ * Invalid input returns `false`.
+ *
+ * @param {number|bigint|string} n - The number to convert
+ * @param {Object} [opt] - Options object
+ * @param {string} [opt.cap] - Capitalization: 'title', 'upper', or 'lower'
+ * @param {string} [opt.punc] - Punctuation: '!', '?', or '.'
+ * @param {string} [opt.lang] - Language code (default 'en')
+ * @param {string} [opt.point] - Word for the decimal point (default 'point')
+ * @returns {string|false} The word representation or false if invalid
+ *
+ * @example
+ * numberstring(42)                  // 'forty-two'
+ * numberstring(-5)                  // 'negative five'
+ * numberstring(3.14)                // 'three point one four'
+ * numberstring('1000')              // 'one thousand'
+ * numberstring(42, { lang: 'es' })  // 'cuarenta y dos'
+ */
+const string = (n, opt) => {
+  let value = n;
+  // Delegates apply `cap` themselves; `punc` is applied once in finish()
+  const inner = opt ? { ...opt, punc: undefined } : opt;
+  const lang = opt?.lang?.toLowerCase();
+  const foreign = Boolean(lang && LANGUAGES[lang] && LANGUAGES[lang] !== 'english');
+
+  if (typeof value === 'string') {
+    const str = value.trim();
+    if (!/^-?\d+(\.\d+)?$/.test(str)) return false;
+    // Other languages only cover non-negative integers; don't fall back to English
+    if (str.includes('.')) return foreign ? false : finish(decimal(str, inner), opt);
+    const digits = str.replace('-', '');
+    value = digits.length <= 15 ? Number(str) : BigInt(str);
+  }
+
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return false;
+    if (!Number.isInteger(value)) return foreign ? false : finish(decimal(value, inner), opt);
+    if (value < 0) return foreign ? false : finish(negative(value, inner), opt);
+  } else if (typeof value === 'bigint') {
+    if (value < 0n) return foreign ? false : finish(negative(value, inner), opt);
+  } else {
+    return false;
+  }
+
+  if (foreign) return finish(toWords(value, inner), opt);
+  return cardinal(value, opt);
+};
+
+/** Apply `punc` to a delegated result (helpers already apply `cap`). */
+const finish = (result, opt) => {
+  if (result === false) return false;
+  if (opt?.punc !== undefined) return punc(result, opt.punc);
+  return result;
+};
+
 // ============================================================================
 // ORDINAL FUNCTION
 // ============================================================================
@@ -226,10 +284,10 @@ const ordinal = (n, opt) => {
       s = `${TENS[tensDigit]}-${ORDINAL_ONES[onesDigit]}`;
     }
   } else {
-    const cardinal = string(num);
-    if (!cardinal) return false;
+    const base = cardinal(num);
+    if (!base) return false;
 
-    const parts = cardinal.split(' ');
+    const parts = base.split(' ');
     const lastPart = parts[parts.length - 1];
     const hyphenParts = lastPart.split('-');
     const lastWord = hyphenParts[hyphenParts.length - 1];
@@ -272,8 +330,12 @@ const decimal = (n, opt) => {
   let numStr;
 
   if (typeof n === 'number') {
-    if (isNaN(n)) return false;
+    if (!Number.isFinite(n)) return false;
     numStr = n.toString();
+    if (numStr.includes('e')) {
+      if (!Number.isInteger(n)) return false;
+      numStr = BigInt(n).toString();
+    }
   } else if (typeof n === 'string') {
     numStr = n.trim();
     if (!/^-?\d+\.?\d*$/.test(numStr) && !/^-?\d*\.?\d+$/.test(numStr)) {
@@ -289,8 +351,9 @@ const decimal = (n, opt) => {
   const pointWord = opt?.point || 'point';
   const [intPart, decPart] = numStr.split('.');
 
-  const intNum = parseInt(intPart || '0', 10);
-  const intWords = string(intNum);
+  const intDigits = intPart || '0';
+  const intNum = intDigits.length <= 15 ? parseInt(intDigits, 10) : BigInt(intDigits);
+  const intWords = cardinal(intNum);
   if (intWords === false) return false;
 
   let result = isNegative ? 'negative ' : '';
@@ -419,22 +482,30 @@ const parse = (str) => {
 
   let result = useBigInt ? 0n : 0;
   let current = useBigInt ? 0n : 0;
+  let lastSimple = null;
 
   for (const word of words) {
     if (Object.hasOwn(WORD_VALUES, word)) {
       const val = WORD_VALUES[word];
+      // Only "tens + ones" (twenty two) may follow a simple word directly;
+      // "nineteen eighty" is a year, not a cardinal
+      const tensThenOnes = lastSimple >= 20 && lastSimple % 10 === 0 && val >= 1 && val <= 9;
+      if (lastSimple !== null && !tensThenOnes) return false;
+      lastSimple = val;
       if (useBigInt) {
         current += BigInt(val);
       } else {
         current += val;
       }
     } else if (word === 'hundred') {
+      lastSimple = null;
       if (useBigInt) {
         current *= 100n;
       } else {
         current *= 100;
       }
     } else if (Object.hasOwn(SCALE_VALUES, word)) {
+      lastSimple = null;
       const scale = SCALE_VALUES[word];
       if (useBigInt) {
         const bigScale = typeof scale === 'bigint' ? scale : BigInt(scale);
@@ -463,8 +534,8 @@ const parse = (str) => {
 
 const negative = (n, opt) => {
   if (typeof n === 'bigint') {
-    if (n >= 0n) return string(n, opt);
-    const result = string(-n, opt);
+    if (n >= 0n) return cardinal(n, opt);
+    const result = cardinal(-n, opt);
     if (result === false) return false;
     let s = `negative ${result}`;
     if (opt?.cap) s = cap(s, opt.cap);
@@ -473,9 +544,9 @@ const negative = (n, opt) => {
 
   if (typeof n !== 'number' || isNaN(n)) return false;
 
-  if (n >= 0) return string(n, opt);
+  if (n >= 0) return cardinal(n, opt);
 
-  const result = string(Math.abs(n), opt);
+  const result = cardinal(Math.abs(n), opt);
   if (result === false) return false;
   let s = `negative ${result}`;
   if (opt?.cap) s = cap(s, opt.cap);

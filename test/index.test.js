@@ -134,9 +134,9 @@ describe('numberstring', () => {
       expect(result).toContain('sextillion');
     });
 
-    it('returns false for negative BigInts', () => {
-      expect(numberstring(-1n)).toBe(false);
-      expect(numberstring(-1000000000000000000n)).toBe(false);
+    it('converts negative BigInts', () => {
+      expect(numberstring(-1n)).toBe('negative one');
+      expect(numberstring(-1000000000000000000n)).toBe('negative one quintillion');
     });
 
     it('returns false for BigInts exceeding decillions', () => {
@@ -152,18 +152,17 @@ describe('numberstring', () => {
   });
 
   describe('invalid inputs', () => {
-    it('returns false for non-numbers', () => {
+    it('returns false for non-numeric strings', () => {
       expect(numberstring('one')).toBe(false);
-      expect(numberstring('123')).toBe(false);
+      expect(numberstring('12abc')).toBe(false);
+      expect(numberstring('1e5')).toBe(false);
+      expect(numberstring('')).toBe(false);
     });
 
-    it('returns false for NaN', () => {
+    it('returns false for NaN and Infinity', () => {
       expect(numberstring(NaN)).toBe(false);
-    });
-
-    it('returns false for negative numbers', () => {
-      expect(numberstring(-1)).toBe(false);
-      expect(numberstring(-100)).toBe(false);
+      expect(numberstring(Infinity)).toBe(false);
+      expect(numberstring(-Infinity)).toBe(false);
     });
 
     it('returns false for numbers exceeding MAX_SAFE_INTEGER', () => {
@@ -183,6 +182,60 @@ describe('numberstring', () => {
     it('returns false for objects and arrays', () => {
       expect(numberstring({})).toBe(false);
       expect(numberstring([])).toBe(false);
+    });
+  });
+
+  describe('forgiving input', () => {
+    it('converts negative numbers', () => {
+      expect(numberstring(-1)).toBe('negative one');
+      expect(numberstring(-100)).toBe('negative one hundred');
+    });
+
+    it('converts decimals', () => {
+      expect(numberstring(1.5)).toBe('one point five');
+      expect(numberstring(-3.14)).toBe('negative three point one four');
+      expect(numberstring(0.25, { point: 'dot' })).toBe('zero dot two five');
+    });
+
+    it('converts numeric strings', () => {
+      expect(numberstring('42')).toBe('forty-two');
+      expect(numberstring(' 1000 ')).toBe('one thousand');
+      expect(numberstring('-7')).toBe('negative seven');
+      expect(numberstring('3.5')).toBe('three point five');
+      expect(numberstring('-0.5')).toBe('negative zero point five');
+    });
+
+    it('converts long numeric strings as BigInt', () => {
+      expect(numberstring('1000000000000000000000')).toBe('one sextillion');
+      expect(numberstring('-1000000000000000000')).toBe('negative one quintillion');
+    });
+
+    it('honors the lang option', () => {
+      expect(numberstring(42, { lang: 'es' })).toBe('cuarenta y dos');
+      expect(numberstring(42, { lang: 'FR' })).toBe('quarante-deux');
+      expect(numberstring(42, { lang: 'en' })).toBe('forty-two');
+      expect(numberstring(42, { lang: 'klingon' })).toBe('forty-two');
+      expect(numberstring('42', { lang: 'de' })).toBe('zweiundvierzig');
+    });
+
+    it('applies cap and punc once across delegated paths', () => {
+      expect(numberstring(-7, { cap: 'title', punc: '.' })).toBe('Negative Seven.');
+      expect(numberstring(3.5, { cap: 'upper', punc: '!' })).toBe('THREE POINT FIVE!');
+      expect(numberstring(42, { lang: 'de', cap: 'title', punc: '?' })).toBe('Zweiundvierzig?');
+      expect(numberstring('-2.5', { punc: '!' })).toBe('negative two point five!');
+    });
+
+    it('does not fall back to English for negatives or decimals in other languages', () => {
+      expect(numberstring(-5, { lang: 'es' })).toBe(false);
+      expect(numberstring(1.5, { lang: 'fr' })).toBe(false);
+      expect(numberstring('-2.5', { lang: 'de' })).toBe(false);
+      expect(numberstring(-1n, { lang: 'ru' })).toBe(false);
+      expect(numberstring(-5, { lang: 'en' })).toBe('negative five');
+    });
+
+    it('still rejects invalid delegated input', () => {
+      expect(numberstring(-(Number.MAX_SAFE_INTEGER + 2))).toBe(false);
+      expect(numberstring(-(10n ** 36n))).toBe(false);
     });
   });
 
@@ -384,6 +437,21 @@ describe('decimal', () => {
     it('returns false for invalid input', () => {
       expect(decimal('abc')).toBe(false);
       expect(decimal(NaN)).toBe(false);
+      expect(decimal(Infinity)).toBe(false);
+      expect(decimal(null)).toBe(false);
+    });
+
+    it('expands exponent-form integers instead of truncating', () => {
+      expect(decimal(1e21)).toBe('one sextillion');
+      expect(decimal(-1e21)).toBe('negative one sextillion');
+    });
+
+    it('returns false for exponent-form fractions', () => {
+      expect(decimal(1.5e-7)).toBe(false);
+    });
+
+    it('keeps precision for long integer parts in strings', () => {
+      expect(decimal('1000000000000000000000.5')).toBe('one sextillion point five');
     });
   });
 });
@@ -614,6 +682,14 @@ describe('parse', () => {
       expect(parse('')).toBe(false);
       expect(parse(123)).toBe(false);
     });
+
+    it('rejects adjacent simple words that are not tens + ones', () => {
+      expect(parse('nineteen eighty-four')).toBe(false);
+      expect(parse('ten five')).toBe(false);
+      expect(parse('one two')).toBe(false);
+      expect(parse('twenty two')).toBe(22);
+      expect(parse('two thousand twenty-four')).toBe(2024);
+    });
   });
 });
 
@@ -628,13 +704,23 @@ describe('spanish', () => {
   });
 
   it('converts hundreds', () => {
-    expect(spanish(100)).toBe('ciento');
+    expect(spanish(100)).toBe('cien');
+    expect(spanish(101)).toBe('ciento uno');
     expect(spanish(500)).toBe('quinientos');
+    expect(spanish(100000)).toBe('cien mil');
   });
 
   it('converts thousands', () => {
     expect(spanish(1000)).toBe('mil');
     expect(spanish(2000)).toBe('dos mil');
+    expect(spanish(21000)).toBe('veintiún mil');
+  });
+
+  it('apocopates uno before scale words', () => {
+    expect(spanish(1000000)).toBe('un millón');
+    expect(spanish(2000000)).toBe('dos millones');
+    expect(spanish(101000000)).toBe('ciento un millones');
+    expect(spanish(21)).toBe('veintiuno');
   });
 
   it('applies capitalization', () => {

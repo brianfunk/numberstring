@@ -13,6 +13,8 @@
 
 Transform any number into beautiful words. From `42` to `"forty-two"`, from `1000000` to `"one million"`. Supports **22 languages**, ordinals, currency, Roman numerals, and more!
 
+**Try it:** [numberstring.netlify.app](https://numberstring.netlify.app) — type a number, see it in 22 languages. Runs entirely in your browser.
+
 ## Why numberstring?
 
 - **Zero dependencies** - Lightweight and fast
@@ -20,7 +22,8 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Huge range** - Supports 0 to decillions (10^36) with BigInt
 - **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers
 - **Roman numerals** - Convert to and from Roman numerals
-- **Well tested** - 265 tests with 90%+ coverage
+- **Forgiving input** - Integers, negatives, decimals, numeric strings, BigInt. It just works
+- **Well tested** - 660+ tests with 90%+ coverage, including per-language spot checks
 - **Modern ES modules** - Tree-shakeable, TypeScript-friendly
 
 ## Installation
@@ -37,6 +40,9 @@ import numberstring from 'numberstring';
 numberstring(42);                    // 'forty-two'
 numberstring(1000000);               // 'one million'
 numberstring(10n ** 18n);            // 'one quintillion' (BigInt!)
+numberstring(-3.14);                 // 'negative three point one four'
+numberstring('1000');                // 'one thousand'
+numberstring(42, { lang: 'es' });    // 'cuarenta y dos'
 numberstring(123, { cap: 'title' }); // 'One Hundred Twenty-Three'
 ```
 
@@ -46,13 +52,20 @@ numberstring(123, { cap: 'title' }); // 'One Hundred Twenty-Three'
 
 #### `numberstring(n, [options])`
 
-Convert a number to English words.
+Convert a number to words. Forgiving by design: accepts integers, negatives, decimals, numeric strings, and BigInt, and honors `lang`. Returns `false` for anything it cannot say.
 
 ```javascript
 numberstring(42);                    // 'forty-two'
+numberstring(-7);                    // 'negative seven'
+numberstring(2.5);                   // 'two point five'
+numberstring('1000000');             // 'one million'
+numberstring(42, { lang: 'fr' });    // 'quarante-deux'
 numberstring(100, { cap: 'title' }); // 'One Hundred'
 numberstring(100, { punc: '!' });    // 'one hundred!'
+numberstring('abc');                 // false
 ```
+
+Negatives and decimals are English-only; with another `lang` they return `false` rather than falling back to English.
 
 #### `ordinal(n, [options])`
 
@@ -262,7 +275,7 @@ Languages are modular! To add a new language:
 |--------|------|-------------|
 | `cap` | `string` | Capitalization: `'title'`, `'upper'`, or `'lower'` |
 | `punc` | `string` | Punctuation: `'!'`, `'?'`, or `'.'` |
-| `lang` | `string` | Language code for `toWords()` |
+| `lang` | `string` | Language code for `numberstring()` and `toWords()` |
 | `point` | `string` | Word for decimal point (default: `'point'`) |
 | `lower` | `boolean` | Lowercase Roman numerals |
 
@@ -283,40 +296,15 @@ Languages are modular! To add a new language:
 | **Nonillions** | 10^30 | `five nonillion` *(BigInt)* |
 | **Decillions** | 10^33 | `five decillion` *(BigInt)* |
 
-## REST API Server
+## Playground
 
-numberstring includes a ready-to-use REST API server!
-
-```bash
-cd server
-npm install
-npm start
-# Server running at http://localhost:3456
-```
-
-### Endpoints
-
-| Endpoint | Description | Example |
-|----------|-------------|---------|
-| `GET /convert/:n` | Number to words | `/convert/42` → `"forty-two"` |
-| `GET /convert/:n?lang=es` | Multi-language | `/convert/42?lang=es` → `"cuarenta y dos"` |
-| `GET /ordinal/:n` | Ordinal words | `/ordinal/3` → `"third"` |
-| `GET /decimal/:n` | Decimal words | `/decimal/3.14` → `"three point one four"` |
-| `GET /currency/:amt` | Currency words | `/currency/$99.99` → `"ninety-nine dollars..."` |
-| `GET /roman/:n` | Roman numerals | `/roman/2024` → `"MMXXIV"` |
-| `GET /parse/:words` | Words to number | `/parse/forty-two` → `42` |
-| `GET /comma/:n` | Format with commas | `/comma/1000000` → `"1,000,000"` |
-| `GET /languages` | List languages | Returns supported language codes |
-
-### Example
+The playground at [numberstring.netlify.app](https://numberstring.netlify.app) is a single static page in `site/` that imports the library directly. No framework, no backend.
 
 ```bash
-curl http://localhost:3456/convert/1000000000000000
-# {"input":"1000000000000000","output":"one quadrillion","lang":"en"}
-
-curl "http://localhost:3456/convert/42?lang=fr"
-# {"input":"42","output":"quarante-deux","lang":"fr"}
+npm run site     # stage the library into site/lib and serve at http://localhost:8080
 ```
+
+The former Express REST server lives in `archive/server/`, unmaintained.
 
 ## Development
 
@@ -325,6 +313,7 @@ npm install        # Install dependencies
 npm test           # Run tests
 npm run lint       # Run linter
 npm run test:coverage  # Test with coverage
+npm run site           # Run the playground locally
 ```
 
 ## Contributing

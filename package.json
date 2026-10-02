@@ -1,6 +1,6 @@
 {
   "name": "numberstring",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Number One Way to Makes Words from Numbers",
   "type": "module",
   "main": "index.js",
@@ -15,7 +15,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint . --format stylish",
-    "lint:report": "eslint . --format html -o coverage/lint-report.html"
+    "lint:report": "eslint . --format html -o coverage/lint-report.html",
+    "site:build": "node scripts/build-site.js",
+    "site": "node scripts/build-site.js && node scripts/serve-site.js"
   },
   "repository": {
     "type": "git",
@@ -46,8 +48,6 @@
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.17.0",
-    "express": "^4.21.2",
-    "supertest": "^7.0.0",
     "vitest": "^4.0.18"
   }
 }

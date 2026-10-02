@@ -18,7 +18,8 @@
     "lint": "eslint . --format stylish",
     "lint:report": "eslint . --format html -o coverage/lint-report.html",
     "site:build": "node scripts/build-site.js",
-    "site": "node scripts/build-site.js && node scripts/serve-site.js"
+    "site": "node scripts/build-site.js && node scripts/serve-site.js",
+    "site:og": "sh scripts/build-og.sh"
   },
   "repository": {
     "type": "git",

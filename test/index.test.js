@@ -210,7 +210,7 @@ describe('numberstring', () => {
       expect(numberstring(1e21)).toBe('one sextillion');
       expect(numberstring(-1e21)).toBe('negative one sextillion');
       expect(numberstring(1e21, { lang: 'de' })).toBe('eine Trilliarde');
-      expect(numberstring(1e400)).toBe(false);
+      expect(numberstring(Number.MAX_VALUE)).toBe(false);
     });
 
     it('converts long numeric strings as BigInt', () => {

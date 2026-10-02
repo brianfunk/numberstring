@@ -232,6 +232,11 @@ const string = (n, opt) => {
   if (typeof value === 'number') {
     if (!Number.isFinite(value)) return false;
     if (!Number.isInteger(value)) return foreign ? false : finish(decimal(value, inner), opt);
+    // 1e21 is an integer too; widen to BigInt rather than rejecting it
+    if (Math.abs(value) > Number.MAX_SAFE_INTEGER) value = BigInt(value);
+  }
+
+  if (typeof value === 'number') {
     if (value < 0) return foreign ? false : finish(negative(value, inner), opt);
   } else if (typeof value === 'bigint') {
     if (value < 0n) return foreign ? false : finish(negative(value, inner), opt);

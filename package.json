@@ -6,6 +6,7 @@
   "main": "index.js",
   "exports": {
     ".": {
+      "types": "./index.d.ts",
       "import": "./index.js"
     }
   },
@@ -41,7 +42,7 @@
   "bugs": {
     "url": "https://github.com/brianfunk/numberstring/issues"
   },
-  "homepage": "https://github.com/brianfunk/numberstring#readme",
+  "homepage": "https://numberstring.netlify.app",
   "engines": {
     "node": ">=18.0.0"
   },
@@ -49,5 +50,6 @@
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.17.0",
     "vitest": "^4.0.18"
-  }
+  },
+  "types": "index.d.ts"
 }

@@ -24,7 +24,7 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Roman numerals** - Convert to and from Roman numerals
 - **Forgiving input** - Integers, negatives, decimals, numeric strings, BigInt. It just works
 - **Well tested** - 660+ tests with 90%+ coverage, including per-language spot checks
-- **Modern ES modules** - Tree-shakeable, TypeScript-friendly
+- **Modern ES modules** - Tree-shakeable, with bundled TypeScript declarations
 
 ## Installation
 

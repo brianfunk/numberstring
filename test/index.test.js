@@ -78,9 +78,10 @@ describe('numberstring', () => {
       expect(numberstring(5000000000000000)).toBe('five quadrillion');
     });
 
-    it('returns false for regular numbers exceeding MAX_SAFE_INTEGER', () => {
-      // Regular numbers lose precision above MAX_SAFE_INTEGER
-      expect(numberstring(Number.MAX_SAFE_INTEGER + 1)).toBe(false);
+    it('widens regular numbers above MAX_SAFE_INTEGER to BigInt', () => {
+      // Precision is whatever the float holds; the value is spoken as-is
+      expect(numberstring(Number.MAX_SAFE_INTEGER + 1)).toBe(numberstring(BigInt(Number.MAX_SAFE_INTEGER) + 1n));
+      expect(numberstring(1e21)).toBe('one sextillion');
     });
 
     it('handles MAX_SAFE_INTEGER', () => {
@@ -165,8 +166,8 @@ describe('numberstring', () => {
       expect(numberstring(-Infinity)).toBe(false);
     });
 
-    it('returns false for numbers exceeding MAX_SAFE_INTEGER', () => {
-      expect(numberstring(Number.MAX_SAFE_INTEGER + 1)).toBe(false);
+    it('converts numbers just past MAX_SAFE_INTEGER via BigInt', () => {
+      expect(numberstring(Number.MAX_SAFE_INTEGER + 1)).toBe(numberstring(BigInt(Number.MAX_SAFE_INTEGER) + 1n));
     });
 
     it('returns false for boolean values', () => {
@@ -205,6 +206,13 @@ describe('numberstring', () => {
       expect(numberstring('-0.5')).toBe('negative zero point five');
     });
 
+    it('widens large numbers to BigInt instead of rejecting them', () => {
+      expect(numberstring(1e21)).toBe('one sextillion');
+      expect(numberstring(-1e21)).toBe('negative one sextillion');
+      expect(numberstring(1e21, { lang: 'de' })).toBe('eine Trilliarde');
+      expect(numberstring(1e400)).toBe(false);
+    });
+
     it('converts long numeric strings as BigInt', () => {
       expect(numberstring('1000000000000000000000')).toBe('one sextillion');
       expect(numberstring('-1000000000000000000')).toBe('negative one quintillion');
@@ -233,8 +241,9 @@ describe('numberstring', () => {
       expect(numberstring(-5, { lang: 'en' })).toBe('negative five');
     });
 
-    it('still rejects invalid delegated input', () => {
-      expect(numberstring(-(Number.MAX_SAFE_INTEGER + 2))).toBe(false);
+    it('still rejects values beyond 10^36', () => {
+      expect(numberstring(-1e37)).toBe(false);
+      expect(numberstring(1e37)).toBe(false);
       expect(numberstring(-(10n ** 36n))).toBe(false);
     });
   });

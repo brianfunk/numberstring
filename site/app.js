@@ -97,7 +97,7 @@ const render = (raw) => {
   row('year', smallInt && value >= 1000 && value <= 9999 ? year(value) : false);
   row('currency', !negative && typeof value === 'number' && value < 1e15 ? currency(`$${parsed.str}`) : false);
   row('telephone', wholeInt && parsed.magnitude <= 15 ? telephone(parsed.str) : false);
-  row('fraction', smallInt && value >= 2 && value <= 1000 ? `1/${value} = ${fraction(1, value)}` : false);
+  row('fraction', smallInt && value >= 2 ? `1/${value} = ${fraction(1, value)}` : false);
   row('british', wholeInt ? numberstring(value, { and: true }) : false);
   row('nth', wholeInt ? nth(value) : false);
   row('compact', compact(parsed.str));

@@ -185,8 +185,8 @@ All render with Unicode glyphs, so they need a font that covers the block (most 
 import { egyptian, babylonian, greek } from 'numberstring';
 
 egyptian(42);     // '𓎆𓎆𓎆𓎆𓏺𓏺'       additive, 1 to 9,999,999
-babylonian(42);   // '𒌋𒌋𒌋𒌋𒐕𒐕'       base 60, places separated by spaces
-babylonian(3600); // '𒐕 𒑊 𒑊'
+babylonian(42);   // '𒌋𒌋𒌋𒌋𒁹𒁹'       base 60, places separated by spaces
+babylonian(3600); // '𒁹 𒑊 𒑊'
 greek(42);        // 'μβʹ'             Ionic letters, 1 to 9999
 greek(1999);      // '͵αϡϟθʹ'
 ```

@@ -208,14 +208,14 @@ describe('egyptian', () => {
 
 describe('babylonian', () => {
   it('writes base-60 places with tens and ones wedges', () => {
-    expect(babylonian(1)).toBe('𒐕');
+    expect(babylonian(1)).toBe('𒁹');
     expect(babylonian(10)).toBe('𒌋');
-    expect(babylonian(42)).toBe('𒌋𒌋𒌋𒌋𒐕𒐕');
-    expect(babylonian(59)).toBe('𒌋𒌋𒌋𒌋𒌋𒐕𒐕𒐕𒐕𒐕𒐕𒐕𒐕𒐕');
-    expect(babylonian(60)).toBe('𒐕 𒑊');
-    expect(babylonian(61)).toBe('𒐕 𒐕');
-    expect(babylonian(3600)).toBe('𒐕 𒑊 𒑊');
-    expect(babylonian(1984)).toBe('𒌋𒌋𒌋𒐕𒐕𒐕 𒐕𒐕𒐕𒐕');
+    expect(babylonian(42)).toBe('𒌋𒌋𒌋𒌋𒁹𒁹');
+    expect(babylonian(59)).toBe('𒌋𒌋𒌋𒌋𒌋𒁹𒁹𒁹𒁹𒁹𒁹𒁹𒁹𒁹');
+    expect(babylonian(60)).toBe('𒁹 𒑊');
+    expect(babylonian(61)).toBe('𒁹 𒁹');
+    expect(babylonian(3600)).toBe('𒁹 𒑊 𒑊');
+    expect(babylonian(1984)).toBe('𒌋𒌋𒌋𒁹𒁹𒁹 𒁹𒁹𒁹𒁹');
   });
 
   it('uses the placeholder for zero', () => {
@@ -223,7 +223,7 @@ describe('babylonian', () => {
   });
 
   it('accepts BigInt and rejects invalid input', () => {
-    expect(babylonian(10n ** 18n)).toMatch(/^𒐕/);
+    expect(babylonian(10n ** 18n)).toMatch(/^𒁹/);
     expect(babylonian(-1)).toBe(false);
     expect(babylonian('x')).toBe(false);
   });
@@ -289,6 +289,8 @@ describe('nato', () => {
     expect(nato(42)).toBe('fower too');
     expect(nato(0)).toBe('zero');
     expect(nato('007')).toBe('zero zero seven');
+    expect(nato('000')).toBe('zero zero zero');
+    expect(nato('0000')).toBe('zero zero zero zero');
     expect(nato(10000)).toBe('wun zero tousand');
   });
 

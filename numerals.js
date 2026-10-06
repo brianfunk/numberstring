@@ -122,7 +122,8 @@ const egyptian = (n) => {
 // BABYLONIAN CUNEIFORM
 // ============================================================================
 
-const CUNEIFORM_ONE = '𒐕';
+/** DIŠ (U+12079), the positional unit wedge; GESH2 (U+12415) looks alike but means sixty */
+const CUNEIFORM_ONE = '𒁹';
 const CUNEIFORM_TEN = '𒌋';
 /** Late Babylonian placeholder for an empty sexagesimal position */
 const CUNEIFORM_ZERO = '𒑊';
@@ -135,8 +136,8 @@ const CUNEIFORM_ZERO = '𒑊';
  * @returns {string|false}
  *
  * @example
- * babylonian(42)   // '𒌋𒌋𒌋𒌋𒐕𒐕'
- * babylonian(3600) // '𒐕 𒑊 𒑊'
+ * babylonian(42)   // '𒌋𒌋𒌋𒌋𒁹𒁹'
+ * babylonian(3600) // '𒁹 𒑊 𒑊'
  */
 const babylonian = (n) => {
   const count = toCount(n);

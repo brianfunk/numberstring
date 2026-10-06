@@ -714,7 +714,7 @@ const nato = (n, opt) => {
 
   // Round hundreds / thousands: "fife hundred", "wun tousand", "too fife tousand"
   const roundMatch = !opt?.digits && !fracPart && intPart.match(/^(\d{1,2})(\d?)(00)$/);
-  if (roundMatch && intPart !== '0' && intPart.length >= 3 && intPart.length <= 5) {
+  if (roundMatch && /[1-9]/.test(intPart) && intPart.length >= 3 && intPart.length <= 5) {
     const thousands = intPart.slice(0, -3);
     const hundredsDigit = intPart.slice(-3, -2);
     if (thousands) words.push(...spell(thousands), 'tousand');

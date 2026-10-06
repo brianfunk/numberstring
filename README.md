@@ -110,7 +110,7 @@ Supported currencies: `$` `€` `£` `¥` `₹` `元` (USD, EUR, GBP, JPY, INR, 
 
 #### `roman(n, [options])`
 
-Convert to Roman numerals.
+Convert to Roman numerals. Above 3999, vinculum notation puts a bar over a group to multiply it by 1000 (two bars for a million), reaching 3,999,999,999.
 
 ```javascript
 import { roman } from 'numberstring';
@@ -118,6 +118,8 @@ import { roman } from 'numberstring';
 roman(42);                   // 'XLII'
 roman(1999);                 // 'MCMXCIX'
 roman(4, { lower: true });   // 'iv'
+roman(4000);                 // 'I̅V̅'
+roman(8675309);              // 'V̿I̿I̿I̿D̅C̅L̅X̅X̅V̅CCCIX'
 ```
 
 #### `parse(str)`

@@ -86,7 +86,7 @@ export function decimal(n: number | string, opt?: Pick<Options, 'cap' | 'point'>
 /** Currency words: '$123.45' → 'one hundred twenty-three dollars and forty-five cents' */
 export function currency(amount: number | string, opt?: CurrencyOptions): Result;
 
-/** Roman numerals for 1–3999: 42 → 'XLII' */
+/** Roman numerals for 1–3,999,999,999: 42 → 'XLII'; above 3999 uses vinculum bars (4000 → 'I̅V̅') */
 export function roman(n: number, opt?: RomanOptions): Result;
 
 /** Parse English words back to a number: 'forty-two' → 42. Returns BigInt above the safe integer range. */

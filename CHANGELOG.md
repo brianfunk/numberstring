@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Per-language spot-check tests** - `test/languages.test.js` locks in tricky numbers (21, 71, 80, 91, 100, 101, 1000, 1001, 2000, 21000, 1M, 2M, 21M) for all 22 languages.
 - **TypeScript declarations** - `index.d.ts` covering the default export, every helper, options, and the language functions.
 - Numbers above `Number.MAX_SAFE_INTEGER` (e.g. `1e21`) are widened to BigInt and converted instead of returning `false`.
+- `roman()` now supports vinculum notation above 3999 (a bar multiplies by 1000, two bars by a million), up to 3,999,999,999.
 - Open Graph and Twitter card tags on the playground, with a PNG preview image (`site/og.png`, rendered from `site/og.svg`).
 - `npm run site` and `npm run site:build` scripts.
 

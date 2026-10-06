@@ -446,18 +446,51 @@ const currency = (amount, opt) => {
 // ROMAN NUMERAL FUNCTION
 // ============================================================================
 
-const roman = (n, opt) => {
-  if (typeof n !== 'number' || isNaN(n) || !Number.isInteger(n)) return false;
-  if (n < 1 || n > 3999) return false;
-
+/** Classic Roman numerals for 1-3999 */
+const romanBase = (n) => {
   let result = '';
   let remaining = n;
-
   for (const [value, numeral] of ROMAN_VALUES) {
     while (remaining >= value) {
       result += numeral;
       remaining -= value;
     }
+  }
+  return result;
+};
+
+/** Combining marks for vinculum notation: one bar = x1000, two bars = x1000000 */
+const ROMAN_BARS = Object.freeze(['', '\u0305', '\u033F']);
+
+/** Maximum value expressible with a double vinculum (3,999,999,999) */
+const ROMAN_MAX = 3999999999;
+
+/**
+ * Convert to Roman numerals. Classic numerals cover 1-3999; above that,
+ * vinculum notation places a bar over a group to multiply it by 1000, so
+ * 4000 is I̅V̅ and 8675309 is V̿I̿I̿I̿D̅C̅L̅X̅X̅V̅CCCIX.
+ * @param {number} n - Integer from 1 to 3,999,999,999
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.lower] - Return lowercase numerals
+ * @returns {string|false} The Roman numeral or false if out of range
+ */
+const roman = (n, opt) => {
+  if (typeof n !== 'number' || isNaN(n) || !Number.isInteger(n)) return false;
+  if (n < 1 || n > ROMAN_MAX) return false;
+
+  let result = '';
+  let remaining = n;
+  let level = 0;
+
+  while (remaining > 0) {
+    // The topmost group keeps the classic form up to 3999; lower groups are 0-999
+    const groupValue = remaining < 4000 ? remaining : remaining % 1000;
+    const bar = ROMAN_BARS[level];
+    const letters = romanBase(groupValue);
+    const barred = bar ? [...letters].map((ch) => ch + bar).join('') : letters;
+    result = barred + result;
+    remaining = (remaining - groupValue) / 1000;
+    level++;
   }
 
   return opt?.lower ? result.toLowerCase() : result;

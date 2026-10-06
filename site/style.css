@@ -121,6 +121,8 @@ h2 {
 .facts dt { color: var(--muted); font-family: var(--mono); font-size: 0.9rem; }
 .facts dd { margin: 0; overflow-wrap: anywhere; }
 .facts dd.na { color: var(--muted); }
+/* vinculum bars need room so adjacent overlines don't merge */
+.facts dd.roman { font-family: var(--mono); letter-spacing: 0.12em; }
 
 table { width: 100%; border-collapse: collapse; }
 td { padding: 8px 8px; border-top: 1px solid var(--border); vertical-align: top; }

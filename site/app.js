@@ -32,10 +32,11 @@ const interpret = (raw) => {
   return { str, value, negative, isDecimal, magnitude: digits.length };
 };
 
-const row = (label, text) => {
+const row = (label, text, cls) => {
   const dt = document.createElement('dt');
   dt.textContent = label;
   const dd = document.createElement('dd');
+  if (cls) dd.classList.add(cls);
   if (text === false || text == null) {
     dd.textContent = '—';
     dd.className = 'na';
@@ -73,7 +74,7 @@ const render = (raw) => {
 
   row('comma', isDecimal ? false : comma(value));
   row('ordinal', wholeInt && value !== 0 && value !== 0n ? ordinal(value) : false);
-  row('roman', smallInt && value >= 1 && value <= 3999999999 ? roman(value) : false);
+  row('roman', smallInt && value >= 1 && value <= 3999999999 ? roman(value) : false, 'roman');
   row('year', smallInt && value >= 1000 && value <= 9999 ? year(value) : false);
   row('currency', !negative && typeof value === 'number' && value < 1e15 ? currency(`$${parsed.str}`) : false);
   row('telephone', wholeInt && parsed.magnitude <= 15 ? telephone(parsed.str) : false);

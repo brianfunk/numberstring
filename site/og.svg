@@ -6,5 +6,5 @@
   <text x="200" y="320" font-family="system-ui, sans-serif" font-size="56" fill="#7ee787">forty-two</text>
   <text x="80" y="400" font-family="system-ui, sans-serif" font-size="36" fill="#e8e8e3">cuarenta y dos · quarante-deux · zweiundvierzig</text>
   <text x="80" y="455" font-family="system-ui, sans-serif" font-size="36" fill="#e8e8e3">四十二 · сорок два · बयालीस · اثنان وأربعون</text>
-  <text x="80" y="560" font-family="system-ui, sans-serif" font-size="26" fill="#8b93a1">22 languages · ordinals · Roman numerals · decimals · currency · BigInt to 10³⁶ · zero dependencies</text>
+  <text x="80" y="560" font-family="system-ui, sans-serif" font-size="26" fill="#8b93a1">22 languages · ordinals · NATO · Morse · scientific · hex · Roman · hieroglyphs · emoji · zero dependencies</text>
 </svg>

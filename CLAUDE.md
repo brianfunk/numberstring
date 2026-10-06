@@ -69,17 +69,15 @@ Key constants:
 
 ## Features
 
-- Number to words (cardinal)
-- Ordinals (1st, 2nd, 3rd)
-- Decimals (3.14 → "three point one four")
-- Currency ($1.23 → "one dollar and twenty-three cents")
-- Fractions (1/2 → "one half")
-- Roman numerals (42 → "XLII")
-- Negative numbers
-- BigInt support up to 10^36
-- Forgiving input: `numberstring(-3.14)`, `numberstring('42')`, `numberstring(42, { lang: 'de' })` all work; invalid input returns `false`
-- `cap` casing styles (title, upper, lower, sentence, camel, pascal, snake, kebab, constant, dot); British `and` option, `nth()` suffixes, `compact()` (1.5K), `fancy()` Unicode styles, `nato()`/`icao`/`military` radio numerals, `morse()`, `scientific()`, `binary()`/`octal()`/`hex()`/`radix()`, `bytes()`/`bits()`, `clock()`
-- Egyptian, Babylonian, Greek numerals; Chinese/Japanese `formal` financial numerals
+Everything is exported from `index.js`; every function returns `string | false`.
+
+- English words: `numberstring` (cardinal, forgiving input), `ordinal`, `nth`, `decimal`, `fraction`, `percent`, `currency`, `year`, `telephone` (`oh` option), `negative`, `parse` (words → number)
+- 22 languages via `toWords(n, { lang })` or the named exports; `chinese`/`japanese` take `formal` for 大写/大字
+- Spoken and coded: `nato` (`icao`, `military`), `morse`
+- Notation: `compact` (1.5K), `scientific` (1.984 × 10³), `comma`, `binary`/`octal`/`hex`/`radix`, `bytes`/`bits`
+- Other numeral systems: `roman` (vinculum above 3999), `greek`, `egyptian`, `babylonian`, `fancy` (circled, superscript, doublestruck, keycap/emoji, braille, ...), `clock`
+- Options: `cap` casing styles (title, upper, lower, sentence, camel, pascal, snake, kebab, constant, dot), `punc`, `and` (British), `lang`, `point`, `formal`
+- BigInt support up to 10^36; invalid input returns `false`
 - **Zero runtime dependencies, always.** Never add a package to `dependencies`.
 
 ---

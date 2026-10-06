@@ -25,7 +25,7 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Ancient and alternative numerals** - Egyptian hieroglyphs, Babylonian cuneiform, Greek letters, Chinese/Japanese financial forms
 - **Unicode digit styles** - ④② ⁴² ４２ 𝟜𝟚 4️⃣2️⃣ ⠼⠙⠃
 - **Forgiving input** - Integers, negatives, decimals, numeric strings, BigInt. It just works
-- **Well tested** - 700+ tests with 90%+ coverage, including per-language spot checks
+- **Well tested** - 730+ tests with 90%+ coverage, including per-language spot checks
 - **Modern ES modules** - Tree-shakeable, with bundled TypeScript declarations
 
 ## Installation
@@ -50,6 +50,39 @@ numberstring(123, { cap: 'title' }); // 'One Hundred Twenty-Three'
 ```
 
 ## API Reference
+
+Everything at a glance. Every function returns a `string`, or `false` when the input cannot be converted.
+
+| Function | Example | Result |
+|----------|---------|--------|
+| `numberstring(n, opt)` | `numberstring(-3.14)` | `negative three point one four` |
+| `toWords(n, { lang })` | `toWords(42, { lang: 'es' })` | `cuarenta y dos` |
+| `ordinal(n)` | `ordinal(21)` | `twenty-first` |
+| `nth(n)` | `nth(22)` | `22nd` |
+| `decimal(n)` | `decimal(3.14)` | `three point one four` |
+| `fraction(a, b)` | `fraction(3, 4)` | `three quarters` |
+| `percent(n)` | `percent(50)` | `fifty percent` |
+| `currency(s)` | `currency('$1.50')` | `one dollar and fifty cents` |
+| `year(n)` | `year(1984)` | `nineteen eighty-four` |
+| `telephone(s, { oh })` | `telephone(8675309, { oh: true })` | `eight six seven five three oh nine` |
+| `nato(n)` / `icao` / `military` | `nato(1984)` | `wun niner ait fower` |
+| `morse(n)` | `morse(42)` | `....- ..---` |
+| `compact(n)` | `compact(1500000)` | `1.5M` |
+| `scientific(n)` | `scientific(1984)` | `1.984 × 10³` |
+| `comma(n)` | `comma(1234567)` | `1,234,567` |
+| `binary(n)` / `octal` / `hex` / `radix(n, base)` | `hex(255, { prefix: true })` | `0xff` |
+| `bytes(n)` / `bits(n)` | `bytes(1536)` | `1.5 KB` |
+| `roman(n)` | `roman(1999)` | `MCMXCIX` |
+| `greek(n)` | `greek(42)` | `μβʹ` |
+| `egyptian(n)` | `egyptian(42)` | `𓎆𓎆𓎆𓎆𓏺𓏺` |
+| `babylonian(n)` | `babylonian(42)` | `𒌋𒌋𒌋𒌋𒁹𒁹` |
+| `fancy(n, style)` | `fancy(42, 'doublestruck')` | `𝟜𝟚` |
+| `clock(time)` | `clock('3:30')` | `🕞` |
+| `parse(words)` | `parse('forty-two')` | `42` |
+| `negative(n)` | `negative(-42)` | `negative forty-two` |
+
+Constants: `CAP_STYLES` (casing names for `cap`), `FANCY_STYLE_NAMES` (styles for `fancy`). Each language is also a named export (`spanish`, `french`, ... see below).
+
 
 ### Core Functions
 
@@ -418,14 +451,26 @@ toWords(42, { lang: 'is' });  // 'fjörutíu og tveir'
 | `fi` | Finnish | neljäkymmentäkaksi |
 | `is` | Icelandic | fjörutíu og tveir |
 
+### Direct language exports
+
+Each language is also exported by name for tree-shaking: `spanish`, `french`, `german`, `danish`, `chinese`, `hindi`, `russian`, `portuguese`, `japanese`, `korean`, `arabic`, `italian`, `dutch`, `turkish`, `polish`, `swedish`, `indonesian`, `thai`, `norwegian`, `finnish`, `icelandic`. They take a non-negative integer and return the cardinal words. Use `toWords()` or `numberstring()` with `lang` when you want `cap` and the other options.
+
+```javascript
+import { french, japanese } from 'numberstring';
+
+french(1984);                        // 'mille neuf cent quatre-vingt-quatre'
+japanese(1984, { formal: true });    // '壱千九百八拾四'
+```
+
 ### Adding a New Language
 
 Languages are modular! To add a new language:
 
 1. Create `languages/xx.js` following the pattern in `languages/en.js`
 2. Export your conversion function
-3. Add to `languages/index.js`
-4. Submit a PR!
+3. Add to `languages/index.js`, re-export it from `index.js`, and add it to the `toWords` switch
+4. Add a row to the table in `test/languages.test.js` and a named export in `index.d.ts`
+5. Submit a PR!
 
 ## Options
 

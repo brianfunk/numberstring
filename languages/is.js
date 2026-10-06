@@ -18,22 +18,37 @@ const segment = (n, g) => n % power(g + 1);
 const hundment = (n, g) => Number(segment(n, g) / power(g));
 const tenment = (n, g) => hundment(n, g) % 100;
 
-const tenIs = (n) => {
+// 1-4 decline for gender: masculine (default), feminine (milljón), neuter (hundrað, þúsund)
+const IS_ONES_F = Object.freeze(['', 'ein', 'tvær', 'þrjár', 'fjórar']);
+const IS_ONES_N = Object.freeze(['', 'eitt', 'tvö', 'þrjú', 'fjögur']);
+
+const onesIs = (d, gender) => {
+  if (d >= 1 && d <= 4) {
+    if (gender === 'f') return IS_ONES_F[d];
+    if (gender === 'n') return IS_ONES_N[d];
+  }
+  return IS_ONES[d];
+};
+
+const tenIs = (n, gender) => {
   if (n === 0) return '';
-  if (n < 10) return IS_ONES[n];
+  if (n < 10) return onesIs(n, gender);
   if (n < 20) return IS_TEENS[n - 10];
   const onesDigit = n % 10;
   const tensDigit = Math.floor(n / 10);
   if (onesDigit === 0) return IS_TENS[tensDigit];
-  return `${IS_TENS[tensDigit]} og ${IS_ONES[onesDigit]}`;
+  return `${IS_TENS[tensDigit]} og ${onesIs(onesDigit, gender)}`;
 };
 
 const hundredIs = (n) => {
   if (n < 100 || n >= 1000) return '';
   const h = Math.floor(n / 100);
   if (h === 1) return 'eitt hundrað';
-  return `${IS_ONES[h]} hundruð`;
+  return `${onesIs(h, 'n')} hundruð`;
 };
+
+/** Grammatical gender of each scale word: -jón feminine, -jarður masculine, þúsund neuter */
+const illionGender = (i) => (i === 1 ? 'n' : i % 2 === 0 ? 'f' : 'm');
 
 /**
  * Convert a number to Icelandic words
@@ -69,28 +84,14 @@ const icelandic = (n) => {
         if (h >= 100) s += hundredIs(h) + ' ';
         const t = tenment(num, i);
         if (t > 0) s += tenIs(t);
-      } else if (i === 1) {
-        if (h === 1) {
-          s += 'eitt þúsund ';
-        } else {
-          if (h >= 100) s += hundredIs(h) + ' ';
-          const t = tenment(num, i);
-          if (t > 0) s += tenIs(t) + ' ';
-          s += 'þúsund ';
-        }
       } else {
+        const gender = illionGender(i);
         if (h >= 100) s += hundredIs(h) + ' ';
         const t = tenment(num, i);
-        if (t > 0) {
-          if (t === 1) {
-            s += 'einn ';
-          } else {
-            s += tenIs(t) + ' ';
-          }
-        } else if (h < 100 && h >= 1 && h === 1) {
-          s += 'einn ';
-        }
-        const illionWord = h === 1 ? IS_ILLIONS[i] : IS_ILLIONS_PLURAL[i];
+        if (t > 0) s += tenIs(t, gender) + ' ';
+        // Numbers ending in 1 (but not 11) take the singular: tuttugu og ein milljón
+        const singular = h % 10 === 1 && h % 100 !== 11;
+        const illionWord = singular ? IS_ILLIONS[i] : IS_ILLIONS_PLURAL[i];
         s += `${illionWord} `;
       }
     }

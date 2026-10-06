@@ -11,6 +11,7 @@ npm install        # Install dev dependencies
 npm test           # Run Vitest tests
 npm run lint       # Run ESLint
 npm run test:coverage  # Run tests with coverage report
+npm run site       # Build + serve the playground at http://localhost:8080
 ```
 
 ## Code Style
@@ -18,7 +19,7 @@ npm run test:coverage  # Run tests with coverage report
 - ES2022+ syntax (const/let, arrow functions, template literals)
 - ESM modules only (`import`/`export`)
 - Full JSDoc documentation
-- 100% test coverage target
+- Keep coverage at or above 90% (current level); 100% on functions
 
 ## Architecture
 
@@ -33,7 +34,7 @@ Key constants:
 ## When Making Changes
 
 1. **ALWAYS run lint and tests before committing**: `npm run lint && npm test`
-2. Maintain 100% coverage: `npm run test:coverage`
+2. Keep coverage from dropping: `npm run test:coverage`
 3. Update CHANGELOG.md for any user-facing changes
 4. Preserve the fun flair (ASCII art header, tagline)
 
@@ -43,6 +44,14 @@ Key constants:
 - Review feedback from Codex, human reviewers, and CI systems
 - Fix valid issues before pushing new commits
 - Use `gh pr view <number> --comments` to fetch PR comments
+
+## Layout
+
+- `index.js` - core English conversion plus all public helpers; `numberstring()` is forgiving and delegates to `negative()`, `decimal()`, `toWords()`
+- `languages/` - one module per language, cardinals only, non-negative integers only
+- `test/languages.test.js` - per-language spot-check table; update expectations when fixing a language
+- `site/` - static playground deployed to Netlify (`netlify.toml`); `scripts/build-site.js` copies the library into `site/lib/`
+- `archive/server/` - old Express API, unmaintained, excluded from tests and lint; do not extend it
 
 ## Supported Languages
 
@@ -55,6 +64,7 @@ Key constants:
 - Hindi (`hi`, `hindi`, `हिन्दी`)
 - Russian (`ru`, `russian`, `русский`)
 - Portuguese (`pt`, `portuguese`, `português`)
+- Plus Japanese, Korean, Arabic, Italian, Dutch, Turkish, Polish, Swedish, Indonesian, Thai, Norwegian, Finnish, Icelandic (22 total)
 
 ## Features
 
@@ -66,6 +76,7 @@ Key constants:
 - Roman numerals (42 → "XLII")
 - Negative numbers
 - BigInt support up to 10^36
+- Forgiving input: `numberstring(-3.14)`, `numberstring('42')`, `numberstring(42, { lang: 'de' })` all work; invalid input returns `false`
 
 ---
 

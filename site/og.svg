@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0f1115"/>
+  <text x="80" y="150" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="72" font-weight="700" fill="#e8e8e3">numberstring</text>
+  <text x="80" y="205" font-family="system-ui, sans-serif" font-size="28" font-style="italic" fill="#8b93a1">Number One Way to Makes Words from Numbers</text>
+  <text x="80" y="320" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="56" fill="#f2cc60">42</text>
+  <text x="200" y="320" font-family="system-ui, sans-serif" font-size="56" fill="#7ee787">forty-two</text>
+  <text x="80" y="400" font-family="system-ui, sans-serif" font-size="36" fill="#e8e8e3">cuarenta y dos · quarante-deux · zweiundvierzig</text>
+  <text x="80" y="455" font-family="system-ui, sans-serif" font-size="36" fill="#e8e8e3">四十二 · сорок два · बयालीस · اثنان وأربعون</text>
+  <text x="80" y="560" font-family="system-ui, sans-serif" font-size="26" fill="#8b93a1">22 languages · ordinals · Roman numerals · decimals · currency · BigInt to 10³⁶ · zero dependencies</text>
+</svg>

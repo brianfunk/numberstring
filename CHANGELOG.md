@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Casing styles** - `cap` now also accepts `sentence`, `camel`, `pascal`, `snake`, `kebab` (alias `hyphen`), `constant` (alias `screaming`), and `dot`: `numberstring(123, { cap: 'snake' })` → `one_hundred_twenty_three`. Exported as `CAP_STYLES`.
 - **British `and` option** - `numberstring(123, { and: true })` → "one hundred and twenty-three", `numberstring(1001, { and: true })` → "one thousand and one". Also honored by `ordinal()`.
 - **`nth(n)`** - Numeric ordinal suffix: `1st`, `22nd`, `113th`.
 - **`compact(n, opt)`** - `1.5K`, `2.3B`, `1Sx`, with `digits` and `long` ("1.5 million") options.
@@ -20,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `telephone(n, { oh: true })` says "oh" for zero.
 - **`scientific(n)`** - Exact-mantissa scientific notation: `1984` → "1.984 × 10³", with `caret`, `e`, and `words` formats and a `digits` option.
 - **`binary()`, `octal()`, `hex()`, `radix(n, base)`** - Other bases with `prefix`, `upper`, `pad` options.
-- **`bytes(n)`** - `1.5 KB`, `1.5 KiB`, or "one point five kilobytes".
+- **`bytes(n)`** and **`bits(n)`** - `1.5 KB`, `1.5 KiB`, `1.5 Mb`, or "one point five kilobytes".
 - **`clock(time)`** - Clock-face emoji for an hour or `H:MM`.
 - `fancy()` accepts `emoji` as an alias for `keycap`.
 - `roman()` now supports vinculum notation above 3999 (a bar multiplies by 1000, two bars by a million), up to 3,999,999,999.

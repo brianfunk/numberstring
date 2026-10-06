@@ -68,6 +68,18 @@ numberstring(100, { punc: '!' });    // 'one hundred!'
 numberstring('abc');                 // false
 ```
 
+Every word-producing function takes `cap`, and it does more than capitalize:
+
+```javascript
+numberstring(123, { cap: 'camel' });     // 'oneHundredTwentyThree'
+numberstring(123, { cap: 'pascal' });    // 'OneHundredTwentyThree'
+numberstring(123, { cap: 'snake' });     // 'one_hundred_twenty_three'
+numberstring(123, { cap: 'kebab' });     // 'one-hundred-twenty-three'
+numberstring(123, { cap: 'constant' });  // 'ONE_HUNDRED_TWENTY_THREE'
+numberstring(123, { cap: 'dot' });       // 'one.hundred.twenty.three'
+numberstring(123, { cap: 'sentence' });  // 'One hundred twenty-three'
+```
+
 Negatives and decimals are English-only; with another `lang` they return `false` rather than falling back to English. Pass `and: true` for British style ("one hundred and one", "one thousand and one").
 
 #### `ordinal(n, [options])`
@@ -300,16 +312,18 @@ binary(5, { pad: 8 });                           // '00000101'
 radix(42, 36);                                   // '16'
 ```
 
-#### `bytes(n, [options])`
+#### `bytes(n, [options])` and `bits(n, [options])`
 
-Human-readable byte sizes.
+Human-readable data sizes. Bytes use `KB`/`KiB`, bits use bandwidth-style `kb`/`Mb`.
 
 ```javascript
-import { bytes } from 'numberstring';
+import { bytes, bits } from 'numberstring';
 
 bytes(1536);                     // '1.5 KB'
 bytes(1536, { binary: true });   // '1.5 KiB'
 bytes(1536, { long: true });     // 'one point five kilobytes'
+bits(1500000);                   // '1.5 Mb'
+bits(1500000, { long: true });   // 'one point five megabits'
 ```
 
 #### `clock(time)`
@@ -417,7 +431,7 @@ Languages are modular! To add a new language:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `cap` | `string` | Capitalization: `'title'`, `'upper'`, or `'lower'` |
+| `cap` | `string` | Casing: `'title'`, `'upper'`, `'lower'`, `'sentence'`, `'camel'`, `'pascal'`, `'snake'`, `'kebab'`, `'constant'`, `'dot'` |
 | `punc` | `string` | Punctuation: `'!'`, `'?'`, or `'.'` |
 | `lang` | `string` | Language code for `numberstring()` and `toWords()` |
 | `point` | `string` | Word for decimal point (default: `'point'`) |

@@ -78,7 +78,7 @@ Key constants:
 - Negative numbers
 - BigInt support up to 10^36
 - Forgiving input: `numberstring(-3.14)`, `numberstring('42')`, `numberstring(42, { lang: 'de' })` all work; invalid input returns `false`
-- British `and` option, `nth()` suffixes, `compact()` (1.5K), `fancy()` Unicode styles, `nato()`/`icao`/`military` radio numerals, `morse()`, `scientific()`, `binary()`/`octal()`/`hex()`/`radix()`, `bytes()`, `clock()`
+- `cap` casing styles (title, upper, lower, sentence, camel, pascal, snake, kebab, constant, dot); British `and` option, `nth()` suffixes, `compact()` (1.5K), `fancy()` Unicode styles, `nato()`/`icao`/`military` radio numerals, `morse()`, `scientific()`, `binary()`/`octal()`/`hex()`/`radix()`, `bytes()`/`bits()`, `clock()`
 - Egyptian, Babylonian, Greek numerals; Chinese/Japanese `formal` financial numerals
 - **Zero runtime dependencies, always.** Never add a package to `dependencies`.
 

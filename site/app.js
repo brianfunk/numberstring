@@ -1,7 +1,7 @@
 import numberstring, {
   comma, ordinal, roman, year, currency, telephone, fraction,
   nth, compact, fancy, egyptian, babylonian, greek, chinese, japanese, nato, morse,
-  scientific, binary, octal, hex, bytes, clock
+  scientific, binary, octal, hex, bytes, bits, clock
 } from './lib/index.js';
 
 const LANGS = [
@@ -103,14 +103,23 @@ const render = (raw) => {
   row('binary', !isDecimal ? binary(value, { prefix: true }) : false, 'roman');
   row('octal', !isDecimal ? octal(value, { prefix: true }) : false, 'roman');
   row('hex', !isDecimal ? hex(value, { prefix: true }) : false, 'roman');
-  row('bytes', wholeInt ? `${bytes(value)} · ${bytes(value, { binary: true })}` : false);
+  row('bytes', wholeInt ? bytes(value) : false);
+  row('bytes (binary)', wholeInt ? bytes(value, { binary: true }) : false);
+  row('bits', wholeInt ? bits(value) : false);
   row('morse', morse(parsed.str), 'roman');
   row('fraction', smallInt && value >= 2 ? fraction(1, value) : false);
   row('british', wholeInt ? numberstring(value, { and: true }) : false);
   row('nth', wholeInt ? nth(value) : false);
   row('compact', compact(parsed.str));
   row('title', numberstring(parsed.str, { cap: 'title' }));
+  row('sentence', numberstring(parsed.str, { cap: 'sentence', punc: '.' }));
   row('shout', numberstring(parsed.str, { cap: 'upper', punc: '!' }));
+  row('camelCase', numberstring(parsed.str, { cap: 'camel' }), 'roman');
+  row('PascalCase', numberstring(parsed.str, { cap: 'pascal' }), 'roman');
+  row('snake_case', numberstring(parsed.str, { cap: 'snake' }), 'roman');
+  row('kebab-case', numberstring(parsed.str, { cap: 'kebab' }), 'roman');
+  row('CONSTANT', numberstring(parsed.str, { cap: 'constant' }), 'roman');
+  row('dot.case', numberstring(parsed.str, { cap: 'dot' }), 'roman');
   row('circled', fancy(parsed.str, 'circled'));
   row('superscript', fancy(parsed.str, 'superscript'));
   row('fullwidth', fancy(parsed.str, 'fullwidth'));

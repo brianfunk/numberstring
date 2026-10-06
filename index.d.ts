@@ -3,7 +3,12 @@
  */
 
 /** Capitalization styles */
-export type CapStyle = 'title' | 'upper' | 'lower';
+export type CapStyle =
+  | 'title' | 'upper' | 'lower' | 'sentence'
+  | 'camel' | 'pascal' | 'snake' | 'kebab' | 'hyphen' | 'constant' | 'screaming' | 'dot';
+
+/** The casing styles the `cap` option accepts */
+export const CAP_STYLES: readonly CapStyle[];
 
 /** Trailing punctuation */
 export type Punc = '!' | '?' | '.';
@@ -35,7 +40,7 @@ export type Lang =
   | (string & {});
 
 export interface Options {
-  /** Capitalization: 'title', 'upper', or 'lower' */
+  /** Casing: title, upper, lower, sentence, camel, pascal, snake, kebab, constant, dot */
   cap?: CapStyle;
   /** Trailing punctuation: '!', '?', or '.' */
   punc?: Punc;
@@ -83,7 +88,7 @@ export interface BytesOptions {
   binary?: boolean;
   /** Maximum decimal places (default 1) */
   digits?: number;
-  /** Spell it out: 'one point five kilobytes' */
+  /** Spell it out: 'one point five kilobytes' / 'one point five megabits' */
   long?: boolean;
 }
 
@@ -203,6 +208,9 @@ export function hex(n: Numeric, opt?: RadixOptions): string | false;
 
 /** Human-readable byte sizes: 1536 → '1.5 KB' */
 export function bytes(n: Numeric, opt?: BytesOptions): string | false;
+
+/** Human-readable bit counts: 1500000 → '1.5 Mb' */
+export function bits(n: Numeric, opt?: BytesOptions): string | false;
 
 /** Clock-face emoji for an hour (0-24) or 'H:MM': clock('3:30') → '🕞' */
 export function clock(time: number | string): string | false;

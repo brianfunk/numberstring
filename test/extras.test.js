@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import numberstring, {
   ordinal, nth, compact, fancy, FANCY_STYLE_NAMES, nato, icao, military, morse, telephone,
-  scientific, radix, binary, octal, hex, bytes, clock,
+  scientific, radix, binary, octal, hex, bytes, bits, clock, CAP_STYLES, roman, decimal, currency,
   egyptian, babylonian, greek,
   chinese, japanese, toWords
 } from '../index.js';
@@ -458,6 +458,28 @@ describe('bytes', () => {
   });
 });
 
+describe('bits', () => {
+  it('uses bandwidth-style units', () => {
+    expect(bits(0)).toBe('0 b');
+    expect(bits(999)).toBe('999 b');
+    expect(bits(1000)).toBe('1 kb');
+    expect(bits(1500000)).toBe('1.5 Mb');
+    expect(bits(10n ** 9n)).toBe('1 Gb');
+  });
+
+  it('supports binary units and long form', () => {
+    expect(bits(1536, { binary: true })).toBe('1.5 Kib');
+    expect(bits(1500000, { long: true })).toBe('one point five megabits');
+    expect(bits(1, { long: true })).toBe('one bit');
+    expect(bits(1048576, { binary: true, long: true })).toBe('one mebibit');
+  });
+
+  it('rejects invalid input', () => {
+    expect(bits(-1)).toBe(false);
+    expect(bits(2.5)).toBe(false);
+  });
+});
+
 describe('clock', () => {
   it('maps hours to clock faces', () => {
     expect(clock(1)).toBe('🕐');
@@ -484,5 +506,41 @@ describe('clock', () => {
     expect(clock('x')).toBe(false);
     expect(clock('3:60')).toBe(false);
     expect(clock(null)).toBe(false);
+  });
+});
+
+describe('cap casing styles', () => {
+  it('joins words for code-style casing', () => {
+    expect(numberstring(123, { cap: 'camel' })).toBe('oneHundredTwentyThree');
+    expect(numberstring(123, { cap: 'pascal' })).toBe('OneHundredTwentyThree');
+    expect(numberstring(123, { cap: 'snake' })).toBe('one_hundred_twenty_three');
+    expect(numberstring(123, { cap: 'kebab' })).toBe('one-hundred-twenty-three');
+    expect(numberstring(123, { cap: 'hyphen' })).toBe('one-hundred-twenty-three');
+    expect(numberstring(123, { cap: 'constant' })).toBe('ONE_HUNDRED_TWENTY_THREE');
+    expect(numberstring(123, { cap: 'screaming' })).toBe('ONE_HUNDRED_TWENTY_THREE');
+    expect(numberstring(123, { cap: 'dot' })).toBe('one.hundred.twenty.three');
+  });
+
+  it('sentence case capitalizes only the first letter', () => {
+    expect(numberstring(123, { cap: 'sentence' })).toBe('One hundred twenty-three');
+    expect(numberstring(-5, { cap: 'sentence' })).toBe('Negative five');
+  });
+
+  it('works through delegated paths and other helpers', () => {
+    expect(numberstring(-3.5, { cap: 'snake' })).toBe('negative_three_point_five');
+    expect(numberstring('42', { cap: 'camel', punc: '!' })).toBe('fortyTwo!');
+    expect(numberstring(42, { lang: 'es', cap: 'kebab' })).toBe('cuarenta-y-dos');
+    expect(numberstring(1001, { and: true, cap: 'constant' })).toBe('ONE_THOUSAND_AND_ONE');
+    expect(ordinal(21, { cap: 'camel' })).toBe('twentyFirst');
+    expect(decimal(3.14, { cap: 'pascal' })).toBe('ThreePointOneFour');
+    expect(currency('$1.50', { cap: 'snake' })).toBe('one_dollar_and_fifty_cents');
+    expect(nato(1984, { cap: 'kebab' })).toBe('wun-niner-ait-fower');
+  });
+
+  it('leaves unknown styles alone and exports the list', () => {
+    expect(numberstring(42, { cap: 'wingdings' })).toBe('forty-two');
+    expect(CAP_STYLES).toContain('camel');
+    expect(CAP_STYLES).toContain('snake');
+    expect(roman(4, { lower: true })).toBe('iv');
   });
 });

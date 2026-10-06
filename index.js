@@ -26,6 +26,7 @@ import { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek, clock } from './
 // Re-export language functions and alternative numeral systems
 export { spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic };
 export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek, clock };
+export { CAP_STYLES };
 
 // ============================================================================
 // CONSTANTS
@@ -116,7 +117,18 @@ const ten = (n) => {
   return `${TENS[Math.floor(n / 10)]} `;
 };
 
+/** Casing styles accepted by the `cap` option */
+const CAP_STYLES = Object.freeze(['title', 'upper', 'lower', 'sentence', 'camel', 'pascal', 'snake', 'kebab', 'constant', 'dot']);
+
+const capFirst = (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+
+/**
+ * Apply a casing style. Word-joining styles split on spaces and hyphens:
+ * 'one hundred twenty-three' → camel 'oneHundredTwentyThree', snake
+ * 'one_hundred_twenty_three', kebab 'one-hundred-twenty-three'.
+ */
 const cap = (str, style) => {
+  const words = () => str.split(/[\s-]+/).filter(Boolean);
   switch (style) {
     case 'title':
       return str.replace(/\w([^-\s]*)/g, (txt) =>
@@ -126,6 +138,22 @@ const cap = (str, style) => {
       return str.toUpperCase();
     case 'lower':
       return str.toLowerCase();
+    case 'sentence':
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    case 'camel':
+      return words().map((w, i) => (i === 0 ? w.toLowerCase() : capFirst(w))).join('');
+    case 'pascal':
+      return words().map(capFirst).join('');
+    case 'snake':
+      return words().map((w) => w.toLowerCase()).join('_');
+    case 'kebab':
+    case 'hyphen':
+      return words().map((w) => w.toLowerCase()).join('-');
+    case 'constant':
+    case 'screaming':
+      return words().map((w) => w.toUpperCase()).join('_');
+    case 'dot':
+      return words().map((w) => w.toLowerCase()).join('.');
     default:
       return str;
   }
@@ -209,7 +237,7 @@ const cardinal = (n, opt) => {
  *
  * @param {number|bigint|string} n - The number to convert
  * @param {Object} [opt] - Options object
- * @param {string} [opt.cap] - Capitalization: 'title', 'upper', or 'lower'
+ * @param {string} [opt.cap] - Casing: 'title', 'upper', 'lower', 'sentence', 'camel', 'pascal', 'snake', 'kebab', 'constant', 'dot'
  * @param {string} [opt.punc] - Punctuation: '!', '?', or '.'
  * @param {string} [opt.lang] - Language code (default 'en')
  * @param {string} [opt.point] - Word for the decimal point (default 'point')
@@ -873,26 +901,22 @@ const hex = (n, opt) => radix(n, 16, opt);
 // BYTES
 // ============================================================================
 
-const BYTE_UNITS = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']);
-const BYTE_UNITS_BINARY = Object.freeze(['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']);
-const BYTE_WORDS = Object.freeze(['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte', 'exabyte', 'zettabyte', 'yottabyte']);
-const BYTE_WORDS_BINARY = Object.freeze(['byte', 'kibibyte', 'mebibyte', 'gibibyte', 'tebibyte', 'pebibyte', 'exbibyte', 'zebibyte', 'yobibyte']);
+const BYTE_UNITS = Object.freeze({
+  decimal: ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+  binary: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
+  decimalWords: ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte', 'exabyte', 'zettabyte', 'yottabyte'],
+  binaryWords: ['byte', 'kibibyte', 'mebibyte', 'gibibyte', 'tebibyte', 'pebibyte', 'exbibyte', 'zebibyte', 'yobibyte']
+});
 
-/**
- * Human-readable byte sizes.
- * @param {number|bigint|string} n - Non-negative integer count of bytes
- * @param {Object} [opt] - Options object
- * @param {boolean} [opt.binary] - Use 1024 steps and KiB/MiB units
- * @param {number} [opt.digits=1] - Maximum decimal places
- * @param {boolean} [opt.long] - Spell it out: 'one point five kilobytes'
- * @returns {string|false}
- *
- * @example
- * bytes(1536)                   // '1.5 KB'
- * bytes(1536, { binary: true }) // '1.5 KiB'
- * bytes(1536, { long: true })   // 'one point five kilobytes'
- */
-const bytes = (n, opt) => {
+const BIT_UNITS = Object.freeze({
+  decimal: ['b', 'kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb'],
+  binary: ['b', 'Kib', 'Mib', 'Gib', 'Tib', 'Pib', 'Eib', 'Zib', 'Yib'],
+  decimalWords: ['bit', 'kilobit', 'megabit', 'gigabit', 'terabit', 'petabit', 'exabit', 'zettabit', 'yottabit'],
+  binaryWords: ['bit', 'kibibit', 'mebibit', 'gibibit', 'tebibit', 'pebibit', 'exbibit', 'zebibit', 'yobibit']
+});
+
+/** Shared engine for bytes() and bits() */
+const dataSize = (n, opt, table) => {
   let value;
   if (typeof n === 'bigint') value = n;
   else if (typeof n === 'number' && Number.isInteger(n) && n <= Number.MAX_SAFE_INTEGER) value = BigInt(n);
@@ -901,8 +925,8 @@ const bytes = (n, opt) => {
   if (value < 0n) return false;
 
   const step = opt?.binary ? 1024n : 1000n;
-  const units = opt?.binary ? BYTE_UNITS_BINARY : BYTE_UNITS;
-  const words = opt?.binary ? BYTE_WORDS_BINARY : BYTE_WORDS;
+  const units = opt?.binary ? table.binary : table.decimal;
+  const words = opt?.binary ? table.binaryWords : table.decimalWords;
   const digits = Math.max(0, Math.min(opt?.digits ?? 1, 6));
 
   let unit = 0;
@@ -925,6 +949,35 @@ const bytes = (n, opt) => {
   }
   return `${amount} ${units[unit]}`;
 };
+
+/**
+ * Human-readable byte sizes.
+ * @param {number|bigint|string} n - Non-negative integer count of bytes
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.binary] - Use 1024 steps and KiB/MiB units
+ * @param {number} [opt.digits=1] - Maximum decimal places
+ * @param {boolean} [opt.long] - Spell it out: 'one point five kilobytes'
+ * @returns {string|false}
+ *
+ * @example
+ * bytes(1536)                   // '1.5 KB'
+ * bytes(1536, { binary: true }) // '1.5 KiB'
+ * bytes(1536, { long: true })   // 'one point five kilobytes'
+ */
+const bytes = (n, opt) => dataSize(n, opt, BYTE_UNITS);
+
+/**
+ * Human-readable bit counts (bandwidth style: kb, Mb, Gb).
+ * @param {number|bigint|string} n - Non-negative integer count of bits
+ * @param {Object} [opt] - Same options as bytes()
+ * @returns {string|false}
+ *
+ * @example
+ * bits(1500000)                 // '1.5 Mb'
+ * bits(1536, { binary: true })  // '1.5 Kib'
+ * bits(1500000, { long: true }) // 'one point five megabits'
+ */
+const bits = (n, opt) => dataSize(n, opt, BIT_UNITS);
 
 // ============================================================================
 // MORSE CODE
@@ -1208,5 +1261,6 @@ export {
   octal,
   hex,
   bytes,
+  bits,
   toWords
 };

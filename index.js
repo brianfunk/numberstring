@@ -21,8 +21,11 @@
 // Import language functions
 import { english, spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic, LANGUAGES } from './languages/index.js';
 
-// Re-export language functions
+import { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, mayan, greek, tally } from './numerals.js';
+
+// Re-export language functions and alternative numeral systems
 export { spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic };
+export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, mayan, greek, tally };
 
 // ============================================================================
 // CONSTANTS
@@ -151,6 +154,7 @@ const comma = (n) => {
  * Internal: the public `string()` normalizes input and delegates here.
  * @param {number|bigint} n - The number to convert (0 to 10^36-1)
  * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.and] - British "and" after hundreds / before a final group under 100
  * @returns {string|false} The word representation or false if invalid
  */
 const cardinal = (n, opt) => {
@@ -169,15 +173,20 @@ const cardinal = (n, opt) => {
 
   let s = '';
 
+  const useAnd = opt?.and === true;
+
   if (num === 0n) {
     s = 'zero';
   } else {
     for (let i = group(num); i >= 0; i--) {
-      s += hundred(hundment(num, i));
-      s += ten(tenment(num, i));
-      if (hundment(num, i) > 0) {
-        s += `${ILLIONS[i]} `;
-      }
+      const h = hundment(num, i);
+      if (h === 0) continue;
+      const t = tenment(num, i);
+      s += hundred(h);
+      // British style: "one hundred and one", "one thousand and one"
+      if (useAnd && t > 0 && (h >= 100 || (i === 0 && s))) s += 'and ';
+      s += ten(t);
+      s += `${ILLIONS[i]} `;
     }
   }
 
@@ -204,10 +213,12 @@ const cardinal = (n, opt) => {
  * @param {string} [opt.punc] - Punctuation: '!', '?', or '.'
  * @param {string} [opt.lang] - Language code (default 'en')
  * @param {string} [opt.point] - Word for the decimal point (default 'point')
+ * @param {boolean} [opt.and] - British style: 'one hundred and twenty-three'
  * @returns {string|false} The word representation or false if invalid
  *
  * @example
  * numberstring(42)                  // 'forty-two'
+ * numberstring(123, { and: true })  // 'one hundred and twenty-three'
  * numberstring(-5)                  // 'negative five'
  * numberstring(3.14)                // 'three point one four'
  * numberstring('1000')              // 'one thousand'
@@ -289,7 +300,7 @@ const ordinal = (n, opt) => {
       s = `${TENS[tensDigit]}-${ORDINAL_ONES[onesDigit]}`;
     }
   } else {
-    const base = cardinal(num);
+    const base = cardinal(num, { and: opt?.and });
     if (!base) return false;
 
     const parts = base.split(' ');
@@ -567,6 +578,96 @@ const parse = (str) => {
 };
 
 // ============================================================================
+// NTH (numeric ordinal suffix)
+// ============================================================================
+
+/**
+ * Append the English ordinal suffix to a number: 1st, 2nd, 3rd, 4th, 11th, 112th.
+ * @param {number|bigint|string} n - Integer (negatives keep their sign)
+ * @returns {string|false}
+ *
+ * @example
+ * nth(1)    // '1st'
+ * nth(22)   // '22nd'
+ * nth(113)  // '113th'
+ */
+const nth = (n) => {
+  let value;
+  if (typeof n === 'bigint') value = n;
+  else if (typeof n === 'number' && Number.isInteger(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER) value = BigInt(n);
+  else if (typeof n === 'string' && /^-?\d+$/.test(n.trim())) value = BigInt(n.trim());
+  else return false;
+
+  const abs = value < 0n ? -value : value;
+  const mod100 = Number(abs % 100n);
+  const mod10 = Number(abs % 10n);
+  let suffix = 'th';
+  if (mod100 < 11 || mod100 > 13) {
+    if (mod10 === 1) suffix = 'st';
+    else if (mod10 === 2) suffix = 'nd';
+    else if (mod10 === 3) suffix = 'rd';
+  }
+  return `${value}${suffix}`;
+};
+
+// ============================================================================
+// COMPACT (1.5K, 2.3M)
+// ============================================================================
+
+/** Short suffixes aligned with ILLIONS: thousand, million, billion, ... */
+const COMPACT_SUFFIXES = Object.freeze(['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc']);
+
+/**
+ * Compact notation: 1500 → '1.5K', 2300000 → '2.3M'.
+ * @param {number|bigint|string} n - The number
+ * @param {Object} [opt] - Options object
+ * @param {number} [opt.digits=1] - Maximum decimal places
+ * @param {boolean} [opt.long] - Spell the scale: '1.5 thousand'
+ * @returns {string|false}
+ *
+ * @example
+ * compact(1500)                   // '1.5K'
+ * compact(2300000000)             // '2.3B'
+ * compact(999950)                 // '1M'
+ * compact(1500000, { long: true }) // '1.5 million'
+ */
+const compact = (n, opt) => {
+  let str;
+  if (typeof n === 'bigint') str = n.toString();
+  else if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return false;
+    str = Number.isInteger(n) ? BigInt(n).toString() : n.toString();
+    if (str.includes('e')) return false;
+  } else if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) str = n.trim();
+  else return false;
+
+  const negative = str.startsWith('-');
+  if (negative) str = str.slice(1);
+  const [intPart, fracPart = ''] = str.split('.');
+  const digits = Math.max(0, Math.min(opt?.digits ?? 1, 6));
+
+  if (intPart.length < 4) {
+    const small = Number(`${intPart}.${fracPart || '0'}`);
+    const rounded = Number(small.toFixed(digits));
+    return `${negative ? '-' : ''}${rounded}`;
+  }
+
+  let g = Math.floor((intPart.length - 1) / 3);
+  if (g >= COMPACT_SUFFIXES.length) return false;
+  // Value / 10^(3g) as a float; precision loss is irrelevant at <= 6 decimals
+  const scaled = Number(`${intPart.slice(0, intPart.length - 3 * g)}.${intPart.slice(intPart.length - 3 * g)}${fracPart}`);
+  let value = Number(scaled.toFixed(digits));
+  if (value >= 1000) {
+    g++;
+    if (g >= COMPACT_SUFFIXES.length) return false;
+    value = Number((value / 1000).toFixed(digits));
+  }
+
+  const scale = opt?.long ? ` ${ILLIONS[g]}` : COMPACT_SUFFIXES[g];
+  return `${negative ? '-' : ''}${value}${scale}`;
+};
+
+// ============================================================================
 // ADDITIONAL UTILITY FUNCTIONS
 // ============================================================================
 
@@ -731,7 +832,7 @@ const toWords = (n, opt) => {
       result = danish(n);
       break;
     case 'chinese':
-      result = chinese(n);
+      result = chinese(n, opt);
       break;
     case 'hindi':
       result = hindi(n);
@@ -743,7 +844,7 @@ const toWords = (n, opt) => {
       result = portuguese(n);
       break;
     case 'japanese':
-      result = japanese(n);
+      result = japanese(n, opt);
       break;
     case 'korean':
       result = korean(n);
@@ -805,5 +906,7 @@ export {
   year,
   telephone,
   percent,
+  nth,
+  compact,
   toWords
 };

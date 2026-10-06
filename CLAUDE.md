@@ -48,6 +48,7 @@ Key constants:
 ## Layout
 
 - `index.js` - core English conversion plus all public helpers; `numberstring()` is forgiving and delegates to `negative()`, `decimal()`, `toWords()`
+- `numerals.js` - alternative numeral systems (egyptian, babylonian, mayan, greek, tally) and `fancy()` Unicode digit styles; table-driven, re-exported from index.js
 - `languages/` - one module per language, cardinals only, non-negative integers only
 - `test/languages.test.js` - per-language spot-check table; update expectations when fixing a language
 - `site/` - static playground deployed to Netlify (`netlify.toml`); `scripts/build-site.js` copies the library into `site/lib/`. `og.png` is the social preview; after editing `og.svg` run `npm run site:og` to re-render it
@@ -77,6 +78,9 @@ Key constants:
 - Negative numbers
 - BigInt support up to 10^36
 - Forgiving input: `numberstring(-3.14)`, `numberstring('42')`, `numberstring(42, { lang: 'de' })` all work; invalid input returns `false`
+- British `and` option, `nth()` suffixes, `compact()` (1.5K), `fancy()` Unicode styles
+- Egyptian, Babylonian, Mayan, Greek, tally numerals; Chinese/Japanese `formal` financial numerals
+- **Zero runtime dependencies, always.** Never add a package to `dependencies`.
 
 ---
 

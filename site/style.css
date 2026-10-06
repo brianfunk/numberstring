@@ -123,6 +123,10 @@ h2 {
 .facts dd.na { color: var(--muted); }
 /* vinculum bars need room so adjacent overlines don't merge */
 .facts dd.roman { font-family: var(--mono); letter-spacing: 0.12em; }
+/* historical glyph blocks render small in most fonts */
+.facts dd.glyphs { font-size: 1.35em; line-height: 1.2; letter-spacing: 0.05em; }
+header a.home { color: inherit; text-decoration: none; display: inline-block; }
+header a.home:hover .ascii { color: var(--accent-2); }
 
 table { width: 100%; border-collapse: collapse; }
 td { padding: 8px 8px; border-top: 1px solid var(--border); vertical-align: top; }

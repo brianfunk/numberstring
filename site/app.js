@@ -1,5 +1,6 @@
 import numberstring, {
-  comma, ordinal, roman, year, currency, telephone, fraction
+  comma, ordinal, roman, year, currency, telephone, fraction,
+  nth, compact, fancy, egyptian, babylonian, mayan, greek, tally, chinese, japanese
 } from './lib/index.js';
 
 const LANGS = [
@@ -46,6 +47,24 @@ const row = (label, text, cls) => {
   facts.append(dt, dd);
 };
 
+/** Extra row for the Chinese 大写 / Japanese 大字 financial numerals */
+const formalRow = (code, value) => {
+  const tr = document.createElement('tr');
+  const c = document.createElement('td');
+  c.className = 'code';
+  c.textContent = code;
+  const n = document.createElement('td');
+  n.className = 'name';
+  n.textContent = code === 'zh' ? '大写' : '大字';
+  const w = document.createElement('td');
+  w.className = 'words';
+  const fn = code === 'zh' ? chinese : japanese;
+  const out = value === null ? false : fn(value, { formal: true });
+  w.textContent = out === false ? '—' : out;
+  tr.append(c, n, w);
+  return tr;
+};
+
 const render = (raw) => {
   const parsed = interpret(raw);
   facts.replaceChildren();
@@ -79,8 +98,22 @@ const render = (raw) => {
   row('currency', !negative && typeof value === 'number' && value < 1e15 ? currency(`$${parsed.str}`) : false);
   row('telephone', wholeInt && parsed.magnitude <= 15 ? telephone(parsed.str) : false);
   row('fraction', smallInt && value >= 2 && value <= 1000 ? `1/${value} = ${fraction(1, value)}` : false);
+  row('british', wholeInt ? numberstring(value, { and: true }) : false);
+  row('nth', wholeInt ? nth(value) : false);
+  row('compact', compact(parsed.str));
   row('title', numberstring(parsed.str, { cap: 'title' }));
   row('shout', numberstring(parsed.str, { cap: 'upper', punc: '!' }));
+  row('circled', fancy(parsed.str, 'circled'));
+  row('superscript', fancy(parsed.str, 'superscript'));
+  row('fullwidth', fancy(parsed.str, 'fullwidth'));
+  row('doublestruck', fancy(parsed.str, 'doublestruck'));
+  row('keycap', fancy(parsed.str, 'keycap'));
+  row('braille', fancy(parsed.str, 'braille'));
+  row('egyptian', wholeInt ? egyptian(value) : false, 'glyphs');
+  row('babylonian', wholeInt ? babylonian(value) : false, 'glyphs');
+  row('mayan', wholeInt ? mayan(value) : false, 'glyphs');
+  row('greek', wholeInt ? greek(value) : false, 'glyphs');
+  row('tally', wholeInt ? tally(value) : false, 'glyphs');
 
   for (const [code, name] of LANGS) {
     const tr = document.createElement('tr');
@@ -97,6 +130,7 @@ const render = (raw) => {
     w.textContent = out === false ? '—' : out;
     tr.append(c, n, w);
     langs.append(tr);
+    if (code === 'zh' || code === 'ja') langs.append(formalRow(code, wholeInt ? value : null));
   }
 };
 
@@ -109,7 +143,12 @@ document.querySelectorAll('.chips button').forEach((b) => {
   });
 });
 
-const fromHash = decodeURIComponent(location.hash.slice(1));
+let fromHash = '';
+try {
+  fromHash = decodeURIComponent(location.hash.slice(1));
+} catch {
+  fromHash = '';
+}
 if (fromHash) input.value = fromHash;
 render(input.value);
 input.addEventListener('change', () => {

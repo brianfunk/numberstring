@@ -16,6 +16,7 @@ const lib = join(root, 'site', 'lib');
 rmSync(lib, { recursive: true, force: true });
 mkdirSync(lib, { recursive: true });
 cpSync(join(root, 'index.js'), join(lib, 'index.js'));
+cpSync(join(root, 'numerals.js'), join(lib, 'numerals.js'));
 cpSync(join(root, 'languages'), join(lib, 'languages'), { recursive: true });
 
-process.stdout.write('site/lib/ staged from index.js + languages/\n');
+process.stdout.write('site/lib/ staged from index.js + numerals.js + languages/\n');

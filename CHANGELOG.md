@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-06
+
+### Added
+
+- **British `and` option** - `numberstring(123, { and: true })` → "one hundred and twenty-three", `numberstring(1001, { and: true })` → "one thousand and one". Also honored by `ordinal()`.
+- **`nth(n)`** - Numeric ordinal suffix: `1st`, `22nd`, `113th`.
+- **`compact(n, opt)`** - `1.5K`, `2.3B`, `1Sx`, with `digits` and `long` ("1.5 million") options.
+- **`fancy(n, style)`** - Digits in Unicode styles: circled ④②, superscript ⁴², subscript, fullwidth, bold, doublestruck 𝟜𝟚, sans, monospace, keycap 4️⃣2️⃣, braille ⠼⠙⠃.
+- **Alternative numeral systems** in `numerals.js`: `egyptian()` hieroglyphs (to 9,999,999), `babylonian()` base-60 cuneiform, `mayan()` base-20, `greek()` Ionic letters (to 9999), `tally()` marks.
+- **Financial numerals** - `chinese(n, { formal: true })` → 壹仟零壹 (大写), `japanese(n, { formal: true })` → 壱千壱 (大字). Also via `toWords(n, { lang: 'zh', formal: true })`.
+- `roman()` now supports vinculum notation above 3999 (a bar multiplies by 1000, two bars by a million), up to 3,999,999,999.
+- Open Graph and Twitter card tags on the playground, with a PNG preview image (`site/og.png`, rendered from `site/og.svg`).
+- `bahasa` accepted as an alias for Indonesian.
+
+### Fixed
+
+- Playground: ASCII art header restored to the exact index.js block and no longer skewed by per-line centering; a malformed URL hash no longer breaks the page.
+- Type declarations: per-language converters no longer advertise a `cap` option they ignore (use `toWords()` for that); Spanish and Portuguese keep it, Chinese and Japanese gain `formal`.
+
+### Changed
+
+- Still zero runtime dependencies.
+
 ## [1.1.0] - 2026-10-02
 
 ### Added
@@ -14,8 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Per-language spot-check tests** - `test/languages.test.js` locks in tricky numbers (21, 71, 80, 91, 100, 101, 1000, 1001, 2000, 21000, 1M, 2M, 21M) for all 22 languages.
 - **TypeScript declarations** - `index.d.ts` covering the default export, every helper, options, and the language functions.
 - Numbers above `Number.MAX_SAFE_INTEGER` (e.g. `1e21`) are widened to BigInt and converted instead of returning `false`.
-- `roman()` now supports vinculum notation above 3999 (a bar multiplies by 1000, two bars by a million), up to 3,999,999,999.
-- Open Graph and Twitter card tags on the playground, with a PNG preview image (`site/og.png`, rendered from `site/og.svg`).
 - `npm run site` and `npm run site:build` scripts.
 
 ### Fixed

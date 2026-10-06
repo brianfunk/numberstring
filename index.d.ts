@@ -27,7 +27,7 @@ export type Lang =
   | 'tr' | 'turkish' | 'türkçe'
   | 'pl' | 'polish' | 'polski'
   | 'sv' | 'swedish' | 'svenska'
-  | 'id' | 'indonesian' | 'bahasa'
+  | 'id' | 'indonesian' | 'bahasa' | 'bahasa indonesia'
   | 'th' | 'thai' | 'ไทย'
   | 'no' | 'norwegian' | 'norsk'
   | 'fi' | 'finnish' | 'suomi'
@@ -43,7 +43,28 @@ export interface Options {
   lang?: Lang;
   /** Word for the decimal point (default 'point') */
   point?: string;
+  /** British style: 'one hundred and twenty-three', 'one thousand and one' */
+  and?: boolean;
+  /** Chinese/Japanese only: financial 大写 / 大字 numerals (壹贰叁, 壱弐参) */
+  formal?: boolean;
 }
+
+export interface CompactOptions {
+  /** Maximum decimal places (default 1, max 6) */
+  digits?: number;
+  /** Spell the scale word: '1.5 million' instead of '1.5M' */
+  long?: boolean;
+}
+
+export interface MayanOptions {
+  /** Stack places top to bottom with newlines */
+  vertical?: boolean;
+}
+
+/** Unicode digit styles accepted by fancy() */
+export type FancyStyle =
+  | 'circled' | 'superscript' | 'subscript' | 'fullwidth' | 'bold'
+  | 'doublestruck' | 'sans' | 'monospace' | 'keycap' | 'braille';
 
 export interface CurrencyOptions extends Pick<Options, 'cap'> {
   /** Currency symbol or ISO code when the amount has none: '$', 'USD', '€', 'EUR', '£', 'GBP', '¥', 'JPY', '₹', 'INR', '元', 'CNY' */
@@ -75,10 +96,37 @@ declare function numberstring(n: Numeric, opt?: Options): Result;
 export default numberstring;
 
 /** Convert to words in any supported language (non-negative integers) */
-export function toWords(n: number | bigint, opt?: Pick<Options, 'cap' | 'lang'>): Result;
+export function toWords(n: number | bigint, opt?: Pick<Options, 'cap' | 'lang' | 'formal'>): Result;
 
 /** Ordinal words: 1 → 'first', 21 → 'twenty-first' */
-export function ordinal(n: number | bigint, opt?: Pick<Options, 'cap'>): Result;
+export function ordinal(n: number | bigint, opt?: Pick<Options, 'cap' | 'and'>): Result;
+
+/** Numeric ordinal suffix: 1 → '1st', 22 → '22nd', 113 → '113th' */
+export function nth(n: Numeric): string | false;
+
+/** Compact notation: 1500 → '1.5K', 2300000000 → '2.3B' */
+export function compact(n: Numeric, opt?: CompactOptions): string | false;
+
+/** Digits in a Unicode style: fancy(42) → '④②', fancy(42, 'superscript') → '⁴²' */
+export function fancy(n: Numeric, style?: FancyStyle): string | false;
+
+/** The style names fancy() accepts */
+export const FANCY_STYLE_NAMES: readonly FancyStyle[];
+
+/** Egyptian hieroglyphic numerals, 1 to 9,999,999 */
+export function egyptian(n: Numeric): string | false;
+
+/** Babylonian base-60 cuneiform numerals */
+export function babylonian(n: Numeric): string | false;
+
+/** Mayan base-20 numerals, most significant first */
+export function mayan(n: Numeric, opt?: MayanOptions): string | false;
+
+/** Greek Ionic alphabetic numerals, 1 to 9999 */
+export function greek(n: Numeric): string | false;
+
+/** Tally marks in groups of five, 0 to 1000 */
+export function tally(n: Numeric): string | false;
 
 /** Decimal words: 3.14 → 'three point one four' */
 export function decimal(n: number | string, opt?: Pick<Options, 'cap' | 'point'>): Result;
@@ -113,18 +161,24 @@ export function comma(n: number | bigint): string | false;
 /** Magnitude group: 0 = ones, 1 = thousands, 2 = millions, ... */
 export function group(n: number | bigint): number;
 
-/** A single-language converter for non-negative integers */
-export type LanguageConverter = (n: number | bigint, opt?: Pick<Options, 'cap'>) => Result;
+/** A single-language converter for non-negative integers. Use toWords() for `cap`. */
+export type LanguageConverter = (n: number | bigint) => Result;
 
-export const spanish: LanguageConverter;
+/** Spanish and Portuguese also accept `cap` directly */
+export type LanguageConverterWithCap = (n: number | bigint, opt?: Pick<Options, 'cap'>) => Result;
+
+/** Chinese and Japanese accept `formal` for 大写 / 大字 numerals */
+export type LanguageConverterWithFormal = (n: number | bigint, opt?: Pick<Options, 'formal'>) => Result;
+
+export const spanish: LanguageConverterWithCap;
 export const french: LanguageConverter;
 export const german: LanguageConverter;
 export const danish: LanguageConverter;
-export const chinese: LanguageConverter;
+export const chinese: LanguageConverterWithFormal;
 export const hindi: LanguageConverter;
 export const russian: LanguageConverter;
-export const portuguese: LanguageConverter;
-export const japanese: LanguageConverter;
+export const portuguese: LanguageConverterWithCap;
+export const japanese: LanguageConverterWithFormal;
 export const korean: LanguageConverter;
 export const arabic: LanguageConverter;
 export const italian: LanguageConverter;

@@ -1,6 +1,7 @@
 import numberstring, {
   comma, ordinal, roman, year, currency, telephone, fraction,
-  nth, compact, fancy, egyptian, babylonian, greek, chinese, japanese, nato, morse
+  nth, compact, fancy, egyptian, babylonian, greek, chinese, japanese, nato, morse,
+  scientific, binary, octal, hex, bytes, clock
 } from './lib/index.js';
 
 const LANGS = [
@@ -94,12 +95,17 @@ const render = (raw) => {
   row('comma', isDecimal ? false : comma(value));
   row('ordinal', wholeInt && value !== 0 && value !== 0n ? ordinal(value) : false);
   row('roman', smallInt && value >= 1 && value <= 3999999999 ? roman(value) : false, 'roman');
-  row('year', smallInt && value >= 1000 && value <= 9999 ? year(value) : false);
+  row('year', smallInt && value >= 1 && value <= 9999 ? year(value) : false);
   row('currency', !negative && typeof value === 'number' && value < 1e15 ? currency(`$${parsed.str}`) : false);
   row('telephone', wholeInt && parsed.magnitude <= 15 ? telephone(parsed.str, { oh: true }) : false);
   row('pilot', nato(parsed.str));
+  row('scientific', scientific(parsed.str));
+  row('binary', !isDecimal ? binary(value, { prefix: true }) : false, 'roman');
+  row('octal', !isDecimal ? octal(value, { prefix: true }) : false, 'roman');
+  row('hex', !isDecimal ? hex(value, { prefix: true }) : false, 'roman');
+  row('bytes', wholeInt ? `${bytes(value)} · ${bytes(value, { binary: true })}` : false);
   row('morse', morse(parsed.str), 'roman');
-  row('fraction', smallInt && value >= 2 ? `1/${value} = ${fraction(1, value)}` : false);
+  row('fraction', smallInt && value >= 2 ? fraction(1, value) : false);
   row('british', wholeInt ? numberstring(value, { and: true }) : false);
   row('nth', wholeInt ? nth(value) : false);
   row('compact', compact(parsed.str));
@@ -109,7 +115,8 @@ const render = (raw) => {
   row('superscript', fancy(parsed.str, 'superscript'));
   row('fullwidth', fancy(parsed.str, 'fullwidth'));
   row('doublestruck', fancy(parsed.str, 'doublestruck'));
-  row('keycap', fancy(parsed.str, 'keycap'));
+  row('emoji', fancy(parsed.str, 'emoji'));
+  row('clock', smallInt && value >= 0 && value <= 24 ? clock(value) : false, 'glyphs');
   row('braille', fancy(parsed.str, 'braille'));
   row('egyptian', wholeInt ? egyptian(value) : false, 'glyphs');
   row('babylonian', wholeInt ? babylonian(value) : false, 'glyphs');

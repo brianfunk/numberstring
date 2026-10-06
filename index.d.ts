@@ -60,7 +60,32 @@ export interface CompactOptions {
 /** Unicode digit styles accepted by fancy() */
 export type FancyStyle =
   | 'circled' | 'superscript' | 'subscript' | 'fullwidth' | 'bold'
-  | 'doublestruck' | 'sans' | 'monospace' | 'keycap' | 'braille';
+  | 'doublestruck' | 'sans' | 'monospace' | 'keycap' | 'emoji' | 'braille';
+
+export interface ScientificOptions extends Pick<Options, 'cap'> {
+  /** Maximum significant digits, rounds half up (default 12) */
+  digits?: number;
+  /** 'unicode' (1.984 × 10³), 'caret' (1.984 × 10^3), 'e' (1.984e3), or 'words' */
+  format?: 'unicode' | 'caret' | 'e' | 'words';
+}
+
+export interface RadixOptions {
+  /** Add 0b / 0o / 0x for bases 2, 8, 16 */
+  prefix?: boolean;
+  /** Uppercase letter digits */
+  upper?: boolean;
+  /** Left-pad with zeros to this many digits */
+  pad?: number;
+}
+
+export interface BytesOptions {
+  /** Use 1024 steps and KiB/MiB units */
+  binary?: boolean;
+  /** Maximum decimal places (default 1) */
+  digits?: number;
+  /** Spell it out: 'one point five kilobytes' */
+  long?: boolean;
+}
 
 export interface CurrencyOptions extends Pick<Options, 'cap'> {
   /** Currency symbol or ISO code when the amount has none: '$', 'USD', '€', 'EUR', '£', 'GBP', '¥', 'JPY', '₹', 'INR', '元', 'CNY' */
@@ -163,6 +188,24 @@ export function military(n: Numeric, opt?: NatoOptions): Result;
 
 /** International Morse code digits: 42 → '....- ..---' */
 export function morse(n: Numeric): string | false;
+
+/** Scientific notation with an exact mantissa: 1984 → '1.984 × 10³' */
+export function scientific(n: Numeric, opt?: ScientificOptions): string | false;
+
+/** Integer in another base, 2 to 36: radix(42, 16) → '2a' */
+export function radix(n: Numeric, base?: number, opt?: RadixOptions): string | false;
+/** Binary: 42 → '101010' */
+export function binary(n: Numeric, opt?: RadixOptions): string | false;
+/** Octal: 42 → '52' */
+export function octal(n: Numeric, opt?: RadixOptions): string | false;
+/** Hexadecimal: 42 → '2a' */
+export function hex(n: Numeric, opt?: RadixOptions): string | false;
+
+/** Human-readable byte sizes: 1536 → '1.5 KB' */
+export function bytes(n: Numeric, opt?: BytesOptions): string | false;
+
+/** Clock-face emoji for an hour (0-24) or 'H:MM': clock('3:30') → '🕞' */
+export function clock(time: number | string): string | false;
 
 /** Percent words: 50 → 'fifty percent' */
 export function percent(pct: number | string, opt?: Pick<Options, 'cap'>): Result;

@@ -20,7 +20,7 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Zero dependencies** - Lightweight and fast
 - **22 languages** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian, Portuguese, Japanese, Korean, Arabic, Italian, Dutch, Turkish, Polish, Swedish, Indonesian, Thai, Norwegian, Finnish, Icelandic
 - **Huge range** - Supports 0 to decillions (10^36) with BigInt
-- **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers, NATO/ICAO radio numerals, Morse code
+- **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers, NATO/ICAO radio numerals, Morse code, scientific notation, binary/hex, byte sizes, clock faces
 - **Roman numerals** - Classic and vinculum notation to 3,999,999,999
 - **Ancient and alternative numerals** - Egyptian hieroglyphs, Babylonian cuneiform, Greek letters, Chinese/Japanese financial forms
 - **Unicode digit styles** - ④② ⁴² ４２ 𝟜𝟚 4️⃣2️⃣ ⠼⠙⠃
@@ -165,7 +165,7 @@ compact(1500000, { long: true });  // '1.5 million'
 
 #### `fancy(n, [style])`
 
-Digits in a Unicode style: `circled` (default), `superscript`, `subscript`, `fullwidth`, `bold`, `doublestruck`, `sans`, `monospace`, `keycap`, `braille`.
+Digits in a Unicode style: `circled` (default), `superscript`, `subscript`, `fullwidth`, `bold`, `doublestruck`, `sans`, `monospace`, `keycap` (alias `emoji`), `braille`.
 
 ```javascript
 import { fancy } from 'numberstring';
@@ -271,6 +271,57 @@ import { morse } from 'numberstring';
 
 morse(42);   // '....- ..---'
 morse(3.1);  // '...-- .-.-.- .----'
+```
+
+#### `scientific(n, [options])`
+
+Scientific notation with an exact decimal mantissa. Formats: `unicode` (default), `caret`, `e`, `words`.
+
+```javascript
+import { scientific } from 'numberstring';
+
+scientific(1984);                        // '1.984 × 10³'
+scientific(0.00042);                     // '4.2 × 10⁻⁴'
+scientific(1984, { format: 'e' });       // '1.984e3'
+scientific(1984, { digits: 3 });         // '1.98 × 10³'
+scientific(1984, { format: 'words' });   // 'one point nine eight four times ten to the third'
+```
+
+#### `binary(n)`, `octal(n)`, `hex(n)`, `radix(n, base)`
+
+Integers in other bases, 2 to 36.
+
+```javascript
+import { binary, hex, radix } from 'numberstring';
+
+binary(42);                                      // '101010'
+hex(255, { prefix: true, upper: true });         // '0xFF'
+binary(5, { pad: 8 });                           // '00000101'
+radix(42, 36);                                   // '16'
+```
+
+#### `bytes(n, [options])`
+
+Human-readable byte sizes.
+
+```javascript
+import { bytes } from 'numberstring';
+
+bytes(1536);                     // '1.5 KB'
+bytes(1536, { binary: true });   // '1.5 KiB'
+bytes(1536, { long: true });     // 'one point five kilobytes'
+```
+
+#### `clock(time)`
+
+Clock-face emoji for an hour or an `H:MM` time, rounded to the half hour.
+
+```javascript
+import { clock } from 'numberstring';
+
+clock(3);        // '🕒'
+clock('3:30');   // '🕞'
+clock(15);       // '🕒'
 ```
 
 #### `percent(pct, [options])`

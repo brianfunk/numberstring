@@ -21,11 +21,11 @@
 // Import language functions
 import { english, spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic, LANGUAGES } from './languages/index.js';
 
-import { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek } from './numerals.js';
+import { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek, clock } from './numerals.js';
 
 // Re-export language functions and alternative numeral systems
 export { spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic };
-export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek };
+export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek, clock };
 
 // ============================================================================
 // CONSTANTS
@@ -730,6 +730,203 @@ const nato = (n, opt) => {
 };
 
 // ============================================================================
+// SCIENTIFIC NOTATION
+// ============================================================================
+
+/** Expand a float's exponent form ('1.5e-7') into a plain decimal string */
+const expandExponent = (str) => {
+  const negative = str.startsWith('-');
+  const [m, e] = (negative ? str.slice(1) : str).split('e');
+  const exp = Number(e);
+  const mDigits = m.replace('.', '');
+  const point = m.split('.')[0].length + exp;
+  let out;
+  if (point <= 0) out = `0.${'0'.repeat(-point)}${mDigits}`;
+  else if (point >= mDigits.length) out = `${mDigits}${'0'.repeat(point - mDigits.length)}`;
+  else out = `${mDigits.slice(0, point)}.${mDigits.slice(point)}`;
+  return (negative ? '-' : '') + out;
+};
+
+/** Normalize number | bigint | numeric string to a plain decimal string, or null */
+const toPlainDecimal = (n) => {
+  if (typeof n === 'bigint') return n.toString();
+  if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return null;
+    const str = n.toString();
+    return str.includes('e') ? expandExponent(str) : str;
+  }
+  if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) return n.trim();
+  return null;
+};
+
+/**
+ * Scientific notation with an exact decimal mantissa (no float drift).
+ * @param {number|bigint|string} n - The number
+ * @param {Object} [opt] - Options object
+ * @param {number} [opt.digits=12] - Maximum significant digits (rounds half up)
+ * @param {string} [opt.format='unicode'] - 'unicode' (1.984 × 10³), 'caret' (1.984 × 10^3),
+ *   'e' (1.984e3), or 'words' (one point nine eight four times ten to the third)
+ * @param {string} [opt.cap] - Capitalization for the words format
+ * @returns {string|false}
+ *
+ * @example
+ * scientific(1984)                      // '1.984 × 10³'
+ * scientific(0.00042)                   // '4.2 × 10⁻⁴'
+ * scientific(1984, { format: 'e' })     // '1.984e3'
+ * scientific(1984, { format: 'words' }) // 'one point nine eight four times ten to the third'
+ */
+const scientific = (n, opt) => {
+  let str = toPlainDecimal(n);
+  if (str === null) return false;
+
+  const negative = str.startsWith('-');
+  if (negative) str = str.slice(1);
+  const [rawInt, fracPart = ''] = str.split('.');
+  const intPart = rawInt.replace(/^0+/, '');
+  const all = intPart + fracPart;
+  const firstNonZero = all.search(/[1-9]/);
+
+  let exponent = 0;
+  let sig = '0';
+  if (firstNonZero !== -1) {
+    exponent = intPart ? intPart.length - 1 : -(firstNonZero + 1);
+    sig = all.slice(firstNonZero).replace(/0+$/, '') || '0';
+  }
+
+  const maxDigits = Math.max(1, Math.min(opt?.digits ?? 12, 36));
+  if (sig.length > maxDigits) {
+    const rounded = BigInt(sig.slice(0, maxDigits)) + (Number(sig[maxDigits]) >= 5 ? 1n : 0n);
+    let roundedStr = rounded.toString();
+    if (roundedStr.length > maxDigits) {
+      // 999 → 1000 carries into the exponent
+      exponent++;
+      roundedStr = roundedStr.slice(0, -1);
+    }
+    sig = roundedStr.replace(/0+$/, '') || '0';
+  }
+
+  const mantissa = sig.length > 1 ? `${sig[0]}.${sig.slice(1)}` : sig;
+  const sign = negative ? '-' : '';
+  const format = opt?.format || 'unicode';
+
+  if (format === 'e') return `${sign}${mantissa}e${exponent}`;
+  if (format === 'caret') return `${sign}${mantissa} × 10^${exponent}`;
+  if (format === 'words') {
+    const mantissaWords = decimal(`${sign}${mantissa}`);
+    if (mantissaWords === false) return false;
+    let result = mantissaWords;
+    if (exponent !== 0) {
+      const power = exponent < 0 ? `negative ${ordinal(-exponent)}` : ordinal(exponent);
+      result += ` times ten to the ${power}`;
+    }
+    return opt?.cap ? cap(result, opt.cap) : result;
+  }
+  if (format !== 'unicode') return false;
+  return `${sign}${mantissa} × 10${fancy(exponent, 'superscript')}`;
+};
+
+// ============================================================================
+// RADIX (binary, octal, hex)
+// ============================================================================
+
+const RADIX_PREFIXES = Object.freeze({ 2: '0b', 8: '0o', 16: '0x' });
+
+/**
+ * Integer in another base, 2 to 36.
+ * @param {number|bigint|string} n - Integer
+ * @param {number} [base=2] - Radix, 2 to 36
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.prefix] - Add 0b / 0o / 0x for bases 2, 8, 16
+ * @param {boolean} [opt.upper] - Uppercase letter digits
+ * @param {number} [opt.pad] - Left-pad with zeros to this many digits
+ * @returns {string|false}
+ *
+ * @example
+ * radix(42)                                      // '101010'
+ * radix(42, 16)                                  // '2a'
+ * radix(255, 16, { prefix: true, upper: true })  // '0xFF'
+ */
+const radix = (n, base = 2, opt) => {
+  if (!Number.isInteger(base) || base < 2 || base > 36) return false;
+  let value;
+  if (typeof n === 'bigint') value = n;
+  else if (typeof n === 'number' && Number.isInteger(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER) value = BigInt(n);
+  else if (typeof n === 'string' && /^-?\d+$/.test(n.trim())) value = BigInt(n.trim());
+  else return false;
+
+  const negative = value < 0n;
+  let digits = (negative ? -value : value).toString(base);
+  if (opt?.upper) digits = digits.toUpperCase();
+  if (opt?.pad) digits = digits.padStart(opt.pad, '0');
+  const prefix = opt?.prefix ? (RADIX_PREFIXES[base] || '') : '';
+  return `${negative ? '-' : ''}${prefix}${digits}`;
+};
+
+/** Binary: 42 → '101010' */
+const binary = (n, opt) => radix(n, 2, opt);
+/** Octal: 42 → '52' */
+const octal = (n, opt) => radix(n, 8, opt);
+/** Hexadecimal: 42 → '2a' */
+const hex = (n, opt) => radix(n, 16, opt);
+
+// ============================================================================
+// BYTES
+// ============================================================================
+
+const BYTE_UNITS = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']);
+const BYTE_UNITS_BINARY = Object.freeze(['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']);
+const BYTE_WORDS = Object.freeze(['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte', 'exabyte', 'zettabyte', 'yottabyte']);
+const BYTE_WORDS_BINARY = Object.freeze(['byte', 'kibibyte', 'mebibyte', 'gibibyte', 'tebibyte', 'pebibyte', 'exbibyte', 'zebibyte', 'yobibyte']);
+
+/**
+ * Human-readable byte sizes.
+ * @param {number|bigint|string} n - Non-negative integer count of bytes
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.binary] - Use 1024 steps and KiB/MiB units
+ * @param {number} [opt.digits=1] - Maximum decimal places
+ * @param {boolean} [opt.long] - Spell it out: 'one point five kilobytes'
+ * @returns {string|false}
+ *
+ * @example
+ * bytes(1536)                   // '1.5 KB'
+ * bytes(1536, { binary: true }) // '1.5 KiB'
+ * bytes(1536, { long: true })   // 'one point five kilobytes'
+ */
+const bytes = (n, opt) => {
+  let value;
+  if (typeof n === 'bigint') value = n;
+  else if (typeof n === 'number' && Number.isInteger(n) && n <= Number.MAX_SAFE_INTEGER) value = BigInt(n);
+  else if (typeof n === 'string' && /^\d+$/.test(n.trim())) value = BigInt(n.trim());
+  else return false;
+  if (value < 0n) return false;
+
+  const step = opt?.binary ? 1024n : 1000n;
+  const units = opt?.binary ? BYTE_UNITS_BINARY : BYTE_UNITS;
+  const words = opt?.binary ? BYTE_WORDS_BINARY : BYTE_WORDS;
+  const digits = Math.max(0, Math.min(opt?.digits ?? 1, 6));
+
+  let unit = 0;
+  let scale = 1n;
+  while (unit < units.length - 1 && value >= scale * step) {
+    scale *= step;
+    unit++;
+  }
+  let amount = unit === 0 ? Number(value) : Number((value * 10n ** 6n) / scale) / 1e6;
+  amount = Number(amount.toFixed(digits));
+  if (amount >= Number(step) && unit < units.length - 1) {
+    unit++;
+    amount = Number((amount / Number(step)).toFixed(digits));
+  }
+
+  if (opt?.long) {
+    const amountWords = Number.isInteger(amount) ? cardinal(amount) : decimal(amount);
+    const noun = amount === 1 ? words[unit] : `${words[unit]}s`;
+    return `${amountWords} ${noun}`;
+  }
+  return `${amount} ${units[unit]}`;
+};
+
+// ============================================================================
 // MORSE CODE
 // ============================================================================
 
@@ -1005,5 +1202,11 @@ export {
   nato as icao,
   nato as military,
   morse,
+  scientific,
+  radix,
+  binary,
+  octal,
+  hex,
+  bytes,
   toWords
 };

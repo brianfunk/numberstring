@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`nato(n)`** (aliases `icao`, `military`) - ICAO radiotelephony numerals: `1984` → "wun niner ait fower", `2500` → "too tousand fife hundred", `121.5` → "wun too wun decimal fife".
 - **`morse(n)`** - International Morse code digits.
 - `telephone(n, { oh: true })` says "oh" for zero.
+- **`scientific(n)`** - Exact-mantissa scientific notation: `1984` → "1.984 × 10³", with `caret`, `e`, and `words` formats and a `digits` option.
+- **`binary()`, `octal()`, `hex()`, `radix(n, base)`** - Other bases with `prefix`, `upper`, `pad` options.
+- **`bytes(n)`** - `1.5 KB`, `1.5 KiB`, or "one point five kilobytes".
+- **`clock(time)`** - Clock-face emoji for an hour or `H:MM`.
+- `fancy()` accepts `emoji` as an alias for `keycap`.
 - `roman()` now supports vinculum notation above 3999 (a bar multiplies by 1000, two bars by a million), up to 3,999,999,999.
 - Open Graph and Twitter card tags on the playground, with a PNG preview image (`site/og.png`, rendered from `site/og.svg`).
 - `bahasa` accepted as an alias for Indonesian.

@@ -49,6 +49,7 @@ const FANCY_STYLES = Object.freeze({
   sans: { digits: '𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫', minus: '−', point: '.' },
   monospace: { digits: '𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿', minus: '−', point: '.' },
   keycap: { digits: ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'], minus: '➖', point: '.' },
+  emoji: { digits: ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'], minus: '➖', point: '.' },
   // Braille: numeric indicator ⠼ then a-j, decimal point ⠨, minus ⠤
   braille: { digits: '⠚⠁⠃⠉⠙⠑⠋⠛⠓⠊', minus: '⠤', point: '⠨', prefix: '⠼' }
 });
@@ -60,7 +61,7 @@ const FANCY_STYLE_NAMES = Object.freeze(Object.keys(FANCY_STYLES));
  * Render a number's digits in a Unicode style.
  * @param {number|bigint|string} n - The number
  * @param {string} [style='circled'] - One of circled, superscript, subscript,
- *   fullwidth, bold, doublestruck, sans, monospace, keycap, braille
+ *   fullwidth, bold, doublestruck, sans, monospace, keycap (alias emoji), braille
  * @returns {string|false} Styled digits or false if invalid
  *
  * @example
@@ -154,6 +155,52 @@ const babylonian = (n) => {
 };
 
 // ============================================================================
+// CLOCK FACES
+// ============================================================================
+
+/** 🕐..🕛 for 1..12 o'clock (U+1F550..), 🕜..🕧 for the half hours (U+1F55C..) */
+const CLOCK_HOURS = Object.freeze([...'🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛']);
+const CLOCK_HALVES = Object.freeze([...'🕜🕝🕞🕟🕠🕡🕢🕣🕤🕥🕦🕧']);
+
+/**
+ * Clock-face emoji for an hour (0-24, 24-hour values wrap) or an "H:MM" time.
+ * Minutes round to the nearest half hour; 0 and 24 are 🕛.
+ * @param {number|string} time - Hour, or 'H:MM'
+ * @returns {string|false}
+ *
+ * @example
+ * clock(3)        // '🕒'
+ * clock('3:30')   // '🕞'
+ * clock(15)       // '🕒'
+ * clock('23:50')  // '🕛'
+ */
+const clock = (time) => {
+  let hour;
+  let minute = 0;
+  if (typeof time === 'number') {
+    if (!Number.isInteger(time) || time < 0 || time > 24) return false;
+    hour = time;
+  } else if (typeof time === 'string') {
+    const m = time.trim().match(/^(\d{1,2})(?::(\d{2}))?$/);
+    if (!m) return false;
+    hour = Number(m[1]);
+    minute = Number(m[2] || 0);
+    if (hour > 24 || minute > 59) return false;
+  } else {
+    return false;
+  }
+
+  // Round to the nearest half hour; :45 and later roll to the next hour
+  if (minute >= 45) {
+    hour += 1;
+    minute = 0;
+  }
+  const half = minute >= 15;
+  const index = (hour + 11) % 12;
+  return half ? CLOCK_HALVES[index] : CLOCK_HOURS[index];
+};
+
+// ============================================================================
 // GREEK (IONIC / MILESIAN)
 // ============================================================================
 
@@ -186,4 +233,4 @@ const greek = (n) => {
   return out + GREEK_KERAIA;
 };
 
-export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek };
+export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek, clock };

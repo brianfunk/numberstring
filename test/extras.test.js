@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import numberstring, {
   ordinal, nth, compact, fancy, FANCY_STYLE_NAMES, nato, icao, military, morse, telephone,
+  scientific, radix, binary, octal, hex, bytes, clock,
   egyptian, babylonian, greek,
   chinese, japanese, toWords
 } from '../index.js';
@@ -157,6 +158,7 @@ describe('fancy', () => {
       sans: '𝟦𝟤',
       monospace: '𝟺𝟸',
       keycap: '4️⃣2️⃣',
+      emoji: '4️⃣2️⃣',
       braille: '⠼⠙⠃'
     };
     expect([...FANCY_STYLE_NAMES].sort()).toEqual(Object.keys(expected).sort());
@@ -346,5 +348,139 @@ describe('telephone oh option', () => {
     expect(telephone('555-0100', { oh: true })).toBe('five five five oh one oh oh');
     expect(telephone('555-0100')).toBe('five five five zero one zero zero');
     expect(telephone(8675309, { oh: true, cap: 'title' })).toBe('Eight Six Seven Five Three Oh Nine');
+  });
+});
+
+describe('scientific', () => {
+  it('formats with a superscript exponent by default', () => {
+    expect(scientific(1984)).toBe('1.984 × 10³');
+    expect(scientific(42)).toBe('4.2 × 10¹');
+    expect(scientific(1)).toBe('1 × 10⁰');
+    expect(scientific(0)).toBe('0 × 10⁰');
+    expect(scientific(100)).toBe('1 × 10²');
+    expect(scientific(0.00042)).toBe('4.2 × 10⁻⁴');
+    expect(scientific('0.5')).toBe('5 × 10⁻¹');
+    expect(scientific(-1500)).toBe('-1.5 × 10³');
+  });
+
+  it('keeps an exact mantissa for floats, BigInt, and exponent-form input', () => {
+    expect(scientific(1.5e-7)).toBe('1.5 × 10⁻⁷');
+    expect(scientific(-1.5e-7)).toBe('-1.5 × 10⁻⁷');
+    expect(scientific(1e21)).toBe('1 × 10²¹');
+    expect(scientific(6.02214076e23)).toBe('6.02214076 × 10²³');
+    expect(scientific(10n ** 36n - 1n)).toBe('1 × 10³⁶');
+    expect(scientific(123456789012345)).toBe('1.23456789012 × 10¹⁴');
+  });
+
+  it('rounds to the requested significant digits with carry', () => {
+    expect(scientific(1984, { digits: 2 })).toBe('2 × 10³');
+    expect(scientific(1984, { digits: 3 })).toBe('1.98 × 10³');
+    expect(scientific(999, { digits: 2 })).toBe('1 × 10³');
+  });
+
+  it('supports caret, e, and words formats', () => {
+    expect(scientific(1984, { format: 'caret' })).toBe('1.984 × 10^3');
+    expect(scientific(1984, { format: 'e' })).toBe('1.984e3');
+    expect(scientific(0.00042, { format: 'e' })).toBe('4.2e-4');
+    expect(scientific(1984, { format: 'words' })).toBe('one point nine eight four times ten to the third');
+    expect(scientific(0.00042, { format: 'words' })).toBe('four point two times ten to the negative fourth');
+    expect(scientific(1, { format: 'words' })).toBe('one');
+    expect(scientific(-0.00042, { format: 'words', cap: 'title' })).toBe('Negative Four Point Two Times Ten To The Negative Fourth');
+  });
+
+  it('rejects invalid input and formats', () => {
+    expect(scientific('abc')).toBe(false);
+    expect(scientific(NaN)).toBe(false);
+    expect(scientific(Infinity)).toBe(false);
+    expect(scientific(1, { format: 'latex' })).toBe(false);
+  });
+});
+
+describe('radix, binary, octal, hex', () => {
+  it('converts integers between bases', () => {
+    expect(binary(42)).toBe('101010');
+    expect(octal(42)).toBe('52');
+    expect(hex(42)).toBe('2a');
+    expect(radix(42, 36)).toBe('16');
+    expect(hex('255')).toBe('ff');
+    expect(binary(10n ** 20n)).toBe((10n ** 20n).toString(2));
+  });
+
+  it('supports prefix, upper, pad, and negatives', () => {
+    expect(hex(255, { prefix: true, upper: true })).toBe('0xFF');
+    expect(binary(-5, { prefix: true })).toBe('-0b101');
+    expect(binary(5, { pad: 8 })).toBe('00000101');
+    expect(octal(8, { prefix: true })).toBe('0o10');
+    expect(radix(42, 36, { prefix: true })).toBe('16');
+  });
+
+  it('rejects bad bases and non-integers', () => {
+    expect(radix(42, 1)).toBe(false);
+    expect(radix(42, 37)).toBe(false);
+    expect(radix(1.5)).toBe(false);
+    expect(radix('x')).toBe(false);
+    expect(binary(NaN)).toBe(false);
+  });
+});
+
+describe('bytes', () => {
+  it('uses decimal units by default', () => {
+    expect(bytes(0)).toBe('0 B');
+    expect(bytes(999)).toBe('999 B');
+    expect(bytes(1000)).toBe('1 KB');
+    expect(bytes(1536)).toBe('1.5 KB');
+    expect(bytes(1048576)).toBe('1 MB');
+    expect(bytes(1536000)).toBe('1.5 MB');
+    expect(bytes(10n ** 15n)).toBe('1 PB');
+    expect(bytes(999999)).toBe('1 MB');
+  });
+
+  it('uses binary units on request', () => {
+    expect(bytes(1536, { binary: true })).toBe('1.5 KiB');
+    expect(bytes(1048576, { binary: true })).toBe('1 MiB');
+    expect(bytes(1023, { binary: true })).toBe('1023 B');
+  });
+
+  it('spells out long form with plurals', () => {
+    expect(bytes(1536, { long: true })).toBe('one point five kilobytes');
+    expect(bytes(1, { long: true })).toBe('one byte');
+    expect(bytes(1000, { long: true })).toBe('one kilobyte');
+    expect(bytes(1048576, { binary: true, long: true })).toBe('one mebibyte');
+  });
+
+  it('honors digits and rejects invalid input', () => {
+    expect(bytes(1536, { digits: 0 })).toBe('2 KB');
+    expect(bytes(-1)).toBe(false);
+    expect(bytes(1.5)).toBe(false);
+    expect(bytes('abc')).toBe(false);
+  });
+});
+
+describe('clock', () => {
+  it('maps hours to clock faces', () => {
+    expect(clock(1)).toBe('🕐');
+    expect(clock(3)).toBe('🕒');
+    expect(clock(12)).toBe('🕛');
+    expect(clock(0)).toBe('🕛');
+    expect(clock(24)).toBe('🕛');
+    expect(clock(15)).toBe('🕒');
+  });
+
+  it('rounds H:MM to the nearest half hour', () => {
+    expect(clock('3:30')).toBe('🕞');
+    expect(clock('3:14')).toBe('🕒');
+    expect(clock('3:15')).toBe('🕞');
+    expect(clock('12:44')).toBe('🕧');
+    expect(clock('12:45')).toBe('🕐');
+    expect(clock('23:50')).toBe('🕛');
+    expect(clock('0:30')).toBe('🕧');
+  });
+
+  it('rejects invalid input', () => {
+    expect(clock(25)).toBe(false);
+    expect(clock(1.5)).toBe(false);
+    expect(clock('x')).toBe(false);
+    expect(clock('3:60')).toBe(false);
+    expect(clock(null)).toBe(false);
   });
 });

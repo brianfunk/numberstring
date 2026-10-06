@@ -1,11 +1,12 @@
 {
   "name": "numberstring",
-  "version": "1.0.1",
-  "description": "Number One Way to Makes Words from Numbers",
+  "version": "1.2.0",
+  "description": "Numbers to words in 22 languages, plus ordinals, Roman, NATO, Morse, scientific, hex, hieroglyphs and more. Zero dependencies.",
   "type": "module",
   "main": "index.js",
   "exports": {
     ".": {
+      "types": "./index.d.ts",
       "import": "./index.js"
     }
   },
@@ -15,39 +16,61 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint . --format stylish",
-    "lint:report": "eslint . --format html -o coverage/lint-report.html"
+    "lint:report": "eslint . --format html -o coverage/lint-report.html",
+    "site:build": "node scripts/build-site.js",
+    "site": "node scripts/build-site.js && node scripts/serve-site.js",
+    "site:og": "sh scripts/build-og.sh"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/brianfunk/numberstring.git"
   },
   "keywords": [
-    "number",
-    "string",
-    "word",
-    "words",
-    "integer",
     "bigint",
-    "text",
+    "binary",
+    "braille",
+    "bytes",
+    "camelcase",
+    "compact",
     "convert",
+    "cuneiform",
+    "decillion",
+    "emoji",
     "english",
+    "hex",
+    "hieroglyphs",
+    "i18n",
+    "icao",
+    "integer",
+    "mayan",
+    "morse",
+    "multilingual",
+    "nato",
+    "number",
+    "number-to-words",
+    "ordinal",
     "quintillion",
-    "decillion"
+    "roman",
+    "scientific-notation",
+    "snake-case",
+    "string",
+    "text",
+    "word",
+    "words"
   ],
   "author": "Brian Funk",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/brianfunk/numberstring/issues"
   },
-  "homepage": "https://github.com/brianfunk/numberstring#readme",
+  "homepage": "https://numberstring.netlify.app",
   "engines": {
     "node": ">=18.0.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.17.0",
-    "express": "^4.21.2",
-    "supertest": "^7.0.0",
     "vitest": "^4.0.18"
-  }
+  },
+  "types": "index.d.ts"
 }

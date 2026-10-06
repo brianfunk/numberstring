@@ -1,5 +1,8 @@
-# Server (API) - repo only, not published to npm
-server/
+# Archived code and the playground site - repo only, not published to npm
+archive/
+site/
+scripts/
+netlify.toml
 
 # Tests
 test/
@@ -39,3 +42,6 @@ Thumbs.db
 
 # Dependencies
 node_modules/
+
+# Netlify local link state
+.netlify/

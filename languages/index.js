@@ -90,6 +90,7 @@ const LANGUAGES = Object.freeze({
   id: 'indonesian',
   indonesian: 'indonesian',
   'bahasa indonesia': 'indonesian',
+  bahasa: 'indonesian',
   th: 'thai',
   thai: 'thai',
   'ไทย': 'thai',

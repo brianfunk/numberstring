@@ -17,6 +17,10 @@ export default [
     }
   },
   {
-    ignores: ['node_modules/', 'coverage/']
+    files: ['site/**/*.js'],
+    languageOptions: { globals: { document: 'readonly', window: 'readonly', location: 'readonly', history: 'readonly' } }
+  },
+  {
+    ignores: ['node_modules/', 'coverage/', 'archive/', 'site/lib/']
   }
 ];

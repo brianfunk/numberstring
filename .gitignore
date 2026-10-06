@@ -29,3 +29,9 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# Playground build output (copied from index.js + languages/)
+site/lib/
+
+# Netlify local state
+.netlify/

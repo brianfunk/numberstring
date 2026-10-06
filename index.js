@@ -21,8 +21,12 @@
 // Import language functions
 import { english, spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic, LANGUAGES } from './languages/index.js';
 
-// Re-export language functions
+import { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek, clock } from './numerals.js';
+
+// Re-export language functions and alternative numeral systems
 export { spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic };
+export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek, clock };
+export { CAP_STYLES };
 
 // ============================================================================
 // CONSTANTS
@@ -93,7 +97,11 @@ const MAX_VALUE = 10n ** 36n - 1n;
 // HELPER FUNCTIONS
 // ============================================================================
 
-const group = (n) => Math.ceil(n.toString().length / 3) - 1;
+const group = (n) => {
+  if (typeof n !== 'number' && typeof n !== 'bigint') return false;
+  if (typeof n === 'number' && !Number.isFinite(n)) return false;
+  return Math.ceil((n < 0 ? -n : n).toString().length / 3) - 1;
+};
 const power = (g) => 10n ** BigInt(g * 3);
 const segment = (n, g) => n % power(g + 1);
 const hundment = (n, g) => Number(segment(n, g) / power(g));
@@ -113,7 +121,18 @@ const ten = (n) => {
   return `${TENS[Math.floor(n / 10)]} `;
 };
 
+/** Casing styles accepted by the `cap` option */
+const CAP_STYLES = Object.freeze(['title', 'upper', 'lower', 'sentence', 'camel', 'pascal', 'snake', 'kebab', 'hyphen', 'constant', 'screaming', 'dot']);
+
+const capFirst = (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+
+/**
+ * Apply a casing style. Word-joining styles split on spaces and hyphens:
+ * 'one hundred twenty-three' → camel 'oneHundredTwentyThree', snake
+ * 'one_hundred_twenty_three', kebab 'one-hundred-twenty-three'.
+ */
 const cap = (str, style) => {
+  const words = () => str.split(/[\s-]+/).filter(Boolean);
   switch (style) {
     case 'title':
       return str.replace(/\w([^-\s]*)/g, (txt) =>
@@ -123,6 +142,22 @@ const cap = (str, style) => {
       return str.toUpperCase();
     case 'lower':
       return str.toLowerCase();
+    case 'sentence':
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    case 'camel':
+      return words().map((w, i) => (i === 0 ? w.toLowerCase() : capFirst(w))).join('');
+    case 'pascal':
+      return words().map(capFirst).join('');
+    case 'snake':
+      return words().map((w) => w.toLowerCase()).join('_');
+    case 'kebab':
+    case 'hyphen':
+      return words().map((w) => w.toLowerCase()).join('-');
+    case 'constant':
+    case 'screaming':
+      return words().map((w) => w.toUpperCase()).join('_');
+    case 'dot':
+      return words().map((w) => w.toLowerCase()).join('.');
     default:
       return str;
   }
@@ -138,8 +173,18 @@ const comma = (n) => {
   if (typeof n === 'bigint') {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
-  if (isNaN(n)) return false;
-  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return false;
+    const [intPart, fracPart] = n.toString().split('.');
+    const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return fracPart === undefined ? grouped : `${grouped}.${fracPart}`;
+  }
+  if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) {
+    const [intPart, fracPart] = n.trim().split('.');
+    const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return fracPart === undefined ? grouped : `${grouped}.${fracPart}`;
+  }
+  return false;
 };
 
 // ============================================================================
@@ -147,14 +192,14 @@ const comma = (n) => {
 // ============================================================================
 
 /**
- * Convert a number or BigInt to its English word representation
+ * Convert a non-negative integer (number or BigInt) to English words.
+ * Internal: the public `string()` normalizes input and delegates here.
  * @param {number|bigint} n - The number to convert (0 to 10^36-1)
  * @param {Object} [opt] - Options object
- * @param {string} [opt.cap] - Capitalization: 'title', 'upper', or 'lower'
- * @param {string} [opt.punc] - Punctuation: '!', '?', or '.'
+ * @param {boolean} [opt.and] - British "and" after hundreds / before a final group under 100
  * @returns {string|false} The word representation or false if invalid
  */
-const string = (n, opt) => {
+const cardinal = (n, opt) => {
   let num;
 
   if (typeof n === 'bigint') {
@@ -170,15 +215,20 @@ const string = (n, opt) => {
 
   let s = '';
 
+  const useAnd = opt?.and === true;
+
   if (num === 0n) {
     s = 'zero';
   } else {
     for (let i = group(num); i >= 0; i--) {
-      s += hundred(hundment(num, i));
-      s += ten(tenment(num, i));
-      if (hundment(num, i) > 0) {
-        s += `${ILLIONS[i]} `;
-      }
+      const h = hundment(num, i);
+      if (h === 0) continue;
+      const t = tenment(num, i);
+      s += hundred(h);
+      // British style: "one hundred and one", "one thousand and one"
+      if (useAnd && t > 0 && (h >= 100 || (i === 0 && s))) s += 'and ';
+      s += ten(t);
+      s += `${ILLIONS[i]} `;
     }
   }
 
@@ -190,6 +240,72 @@ const string = (n, opt) => {
   }
 
   return s;
+};
+
+/**
+ * Convert a number to its word representation.
+ *
+ * Forgiving by design: accepts integers, negatives, decimals, numeric strings,
+ * and BigInt, and honors `opt.lang` for any of the 22 supported languages.
+ * Invalid input returns `false`.
+ *
+ * @param {number|bigint|string} n - The number to convert
+ * @param {Object} [opt] - Options object
+ * @param {string} [opt.cap] - Casing: 'title', 'upper', 'lower', 'sentence', 'camel', 'pascal', 'snake', 'kebab', 'constant', 'dot'
+ * @param {string} [opt.punc] - Punctuation: '!', '?', or '.'
+ * @param {string} [opt.lang] - Language code (default 'en')
+ * @param {string} [opt.point] - Word for the decimal point (default 'point')
+ * @param {boolean} [opt.and] - British style: 'one hundred and twenty-three'
+ * @returns {string|false} The word representation or false if invalid
+ *
+ * @example
+ * numberstring(42)                  // 'forty-two'
+ * numberstring(123, { and: true })  // 'one hundred and twenty-three'
+ * numberstring(-5)                  // 'negative five'
+ * numberstring(3.14)                // 'three point one four'
+ * numberstring('1000')              // 'one thousand'
+ * numberstring(42, { lang: 'es' })  // 'cuarenta y dos'
+ */
+const string = (n, opt) => {
+  let value = n;
+  // Delegates apply `cap` themselves; `punc` is applied once in finish()
+  const inner = opt ? { ...opt, punc: undefined } : opt;
+  const lang = typeof opt?.lang === 'string' ? opt.lang.toLowerCase() : undefined;
+  const foreign = Boolean(lang && LANGUAGES[lang] && LANGUAGES[lang] !== 'english');
+
+  if (typeof value === 'string') {
+    const str = value.trim();
+    if (!/^-?\d+(\.\d+)?$/.test(str)) return false;
+    // Other languages only cover non-negative integers; don't fall back to English
+    if (str.includes('.')) return foreign ? false : finish(decimal(str, inner), opt);
+    const digits = str.replace('-', '');
+    value = digits.length <= 15 ? Number(str) : BigInt(str);
+  }
+
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return false;
+    if (!Number.isInteger(value)) return foreign ? false : finish(decimal(value, inner), opt);
+    // 1e21 is an integer too; widen to BigInt rather than rejecting it
+    if (Math.abs(value) > Number.MAX_SAFE_INTEGER) value = BigInt(value);
+  }
+
+  if (typeof value === 'number') {
+    if (value < 0) return foreign ? false : finish(negative(value, inner), opt);
+  } else if (typeof value === 'bigint') {
+    if (value < 0n) return foreign ? false : finish(negative(value, inner), opt);
+  } else {
+    return false;
+  }
+
+  if (foreign) return finish(toWords(value, inner), opt);
+  return cardinal(value, opt);
+};
+
+/** Apply `punc` to a delegated result (helpers already apply `cap`). */
+const finish = (result, opt) => {
+  if (result === false) return false;
+  if (opt?.punc !== undefined) return punc(result, opt.punc);
+  return result;
 };
 
 // ============================================================================
@@ -226,10 +342,10 @@ const ordinal = (n, opt) => {
       s = `${TENS[tensDigit]}-${ORDINAL_ONES[onesDigit]}`;
     }
   } else {
-    const cardinal = string(num);
-    if (!cardinal) return false;
+    const base = cardinal(num, { and: opt?.and });
+    if (!base) return false;
 
-    const parts = cardinal.split(' ');
+    const parts = base.split(' ');
     const lastPart = parts[parts.length - 1];
     const hyphenParts = lastPart.split('-');
     const lastWord = hyphenParts[hyphenParts.length - 1];
@@ -272,8 +388,12 @@ const decimal = (n, opt) => {
   let numStr;
 
   if (typeof n === 'number') {
-    if (isNaN(n)) return false;
+    if (!Number.isFinite(n)) return false;
     numStr = n.toString();
+    if (numStr.includes('e')) {
+      if (!Number.isInteger(n)) return false;
+      numStr = BigInt(n).toString();
+    }
   } else if (typeof n === 'string') {
     numStr = n.trim();
     if (!/^-?\d+\.?\d*$/.test(numStr) && !/^-?\d*\.?\d+$/.test(numStr)) {
@@ -289,8 +409,9 @@ const decimal = (n, opt) => {
   const pointWord = opt?.point || 'point';
   const [intPart, decPart] = numStr.split('.');
 
-  const intNum = parseInt(intPart || '0', 10);
-  const intWords = string(intNum);
+  const intDigits = intPart || '0';
+  const intNum = intDigits.length <= 15 ? parseInt(intDigits, 10) : BigInt(intDigits);
+  const intWords = cardinal(intNum, { and: opt?.and });
   if (intWords === false) return false;
 
   let result = isNegative ? 'negative ' : '';
@@ -378,18 +499,51 @@ const currency = (amount, opt) => {
 // ROMAN NUMERAL FUNCTION
 // ============================================================================
 
-const roman = (n, opt) => {
-  if (typeof n !== 'number' || isNaN(n) || !Number.isInteger(n)) return false;
-  if (n < 1 || n > 3999) return false;
-
+/** Classic Roman numerals for 1-3999 */
+const romanBase = (n) => {
   let result = '';
   let remaining = n;
-
   for (const [value, numeral] of ROMAN_VALUES) {
     while (remaining >= value) {
       result += numeral;
       remaining -= value;
     }
+  }
+  return result;
+};
+
+/** Combining marks for vinculum notation: one bar = x1000, two bars = x1000000 */
+const ROMAN_BARS = Object.freeze(['', '\u0305', '\u033F']);
+
+/** Maximum value expressible with a double vinculum (3,999,999,999) */
+const ROMAN_MAX = 3999999999;
+
+/**
+ * Convert to Roman numerals. Classic numerals cover 1-3999; above that,
+ * vinculum notation places a bar over a group to multiply it by 1000, so
+ * 4000 is I̅V̅ and 8675309 is V̿I̿I̿I̿D̅C̅L̅X̅X̅V̅CCCIX.
+ * @param {number} n - Integer from 1 to 3,999,999,999
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.lower] - Return lowercase numerals
+ * @returns {string|false} The Roman numeral or false if out of range
+ */
+const roman = (n, opt) => {
+  if (typeof n !== 'number' || isNaN(n) || !Number.isInteger(n)) return false;
+  if (n < 1 || n > ROMAN_MAX) return false;
+
+  let result = '';
+  let remaining = n;
+  let level = 0;
+
+  while (remaining > 0) {
+    // The topmost group keeps the classic form up to 3999; lower groups are 0-999
+    const groupValue = remaining < 4000 ? remaining : remaining % 1000;
+    const bar = ROMAN_BARS[level];
+    const letters = romanBase(groupValue);
+    const barred = bar ? [...letters].map((ch) => ch + bar).join('') : letters;
+    result = barred + result;
+    remaining = (remaining - groupValue) / 1000;
+    level++;
   }
 
   return opt?.lower ? result.toLowerCase() : result;
@@ -419,22 +573,30 @@ const parse = (str) => {
 
   let result = useBigInt ? 0n : 0;
   let current = useBigInt ? 0n : 0;
+  let lastSimple = null;
 
   for (const word of words) {
     if (Object.hasOwn(WORD_VALUES, word)) {
       const val = WORD_VALUES[word];
+      // Only "tens + ones" (twenty two) may follow a simple word directly;
+      // "nineteen eighty" is a year, not a cardinal
+      const tensThenOnes = lastSimple >= 20 && lastSimple % 10 === 0 && val >= 1 && val <= 9;
+      if (lastSimple !== null && !tensThenOnes) return false;
+      lastSimple = val;
       if (useBigInt) {
         current += BigInt(val);
       } else {
         current += val;
       }
     } else if (word === 'hundred') {
+      lastSimple = null;
       if (useBigInt) {
         current *= 100n;
       } else {
         current *= 100;
       }
     } else if (Object.hasOwn(SCALE_VALUES, word)) {
+      lastSimple = null;
       const scale = SCALE_VALUES[word];
       if (useBigInt) {
         const bigScale = typeof scale === 'bigint' ? scale : BigInt(scale);
@@ -458,27 +620,436 @@ const parse = (str) => {
 };
 
 // ============================================================================
-// ADDITIONAL UTILITY FUNCTIONS
+// NTH (numeric ordinal suffix)
 // ============================================================================
 
-const negative = (n, opt) => {
-  if (typeof n === 'bigint') {
-    if (n >= 0n) return string(n, opt);
-    const result = string(-n, opt);
-    if (result === false) return false;
-    let s = `negative ${result}`;
-    if (opt?.cap) s = cap(s, opt.cap);
-    return s;
+/**
+ * Append the English ordinal suffix to a number: 1st, 2nd, 3rd, 4th, 11th, 112th.
+ * @param {number|bigint|string} n - Integer (negatives keep their sign)
+ * @returns {string|false}
+ *
+ * @example
+ * nth(1)    // '1st'
+ * nth(22)   // '22nd'
+ * nth(113)  // '113th'
+ */
+const nth = (n) => {
+  let value;
+  if (typeof n === 'bigint') value = n;
+  else if (typeof n === 'number' && Number.isInteger(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER) value = BigInt(n);
+  else if (typeof n === 'string' && /^-?\d+$/.test(n.trim())) value = BigInt(n.trim());
+  else return false;
+
+  const abs = value < 0n ? -value : value;
+  const mod100 = Number(abs % 100n);
+  const mod10 = Number(abs % 10n);
+  let suffix = 'th';
+  if (mod100 < 11 || mod100 > 13) {
+    if (mod10 === 1) suffix = 'st';
+    else if (mod10 === 2) suffix = 'nd';
+    else if (mod10 === 3) suffix = 'rd';
+  }
+  return `${value}${suffix}`;
+};
+
+// ============================================================================
+// COMPACT (1.5K, 2.3M)
+// ============================================================================
+
+/** Short suffixes aligned with ILLIONS: thousand, million, billion, ... */
+const COMPACT_SUFFIXES = Object.freeze(['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc']);
+
+/**
+ * Compact notation: 1500 → '1.5K', 2300000 → '2.3M'.
+ * @param {number|bigint|string} n - The number
+ * @param {Object} [opt] - Options object
+ * @param {number} [opt.digits=1] - Maximum decimal places
+ * @param {boolean} [opt.long] - Spell the scale: '1.5 thousand'
+ * @returns {string|false}
+ *
+ * @example
+ * compact(1500)                   // '1.5K'
+ * compact(2300000000)             // '2.3B'
+ * compact(999950)                 // '1M'
+ * compact(1500000, { long: true }) // '1.5 million'
+ */
+const compact = (n, opt) => {
+  let str;
+  if (typeof n === 'bigint') str = n.toString();
+  else if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return false;
+    str = Number.isInteger(n) ? BigInt(n).toString() : n.toString();
+    if (str.includes('e')) return false;
+  } else if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) str = n.trim();
+  else return false;
+
+  const negative = str.startsWith('-');
+  if (negative) str = str.slice(1);
+  const [rawInt, fracPart = ''] = str.split('.');
+  // Leading zeros carry no magnitude: '0001000' is 1000
+  const intPart = rawInt.replace(/^0+(?=\d)/, '');
+  const digits = Number.isFinite(opt?.digits) ? Math.max(0, Math.min(Math.trunc(opt.digits), 6)) : 1;
+
+  if (intPart.length < 4) {
+    const small = Number(`${intPart}.${fracPart || '0'}`);
+    const rounded = Number(small.toFixed(digits));
+    // 999.99 rounds up to 1000, which belongs in the next scale
+    if (rounded < 1000) return `${negative ? '-' : ''}${rounded}`;
+    return `${negative ? '-' : ''}1${opt?.long ? ` ${ILLIONS[1]}` : COMPACT_SUFFIXES[1]}`;
   }
 
-  if (typeof n !== 'number' || isNaN(n)) return false;
+  let g = Math.floor((intPart.length - 1) / 3);
+  if (g >= COMPACT_SUFFIXES.length) return false;
+  // Value / 10^(3g) as a float; precision loss is irrelevant at <= 6 decimals
+  const scaled = Number(`${intPart.slice(0, intPart.length - 3 * g)}.${intPart.slice(intPart.length - 3 * g)}${fracPart}`);
+  let value = Number(scaled.toFixed(digits));
+  // Rounding can carry into the next scale; at the last scale keep 1000Dc
+  if (value >= 1000 && g + 1 < COMPACT_SUFFIXES.length) {
+    g++;
+    value = Number((value / 1000).toFixed(digits));
+  }
 
-  if (n >= 0) return string(n, opt);
+  const scale = opt?.long ? ` ${ILLIONS[g]}` : COMPACT_SUFFIXES[g];
+  return `${negative ? '-' : ''}${value}${scale}`;
+};
 
-  const result = string(Math.abs(n), opt);
+// ============================================================================
+// NATO / ICAO PHONETIC NUMERALS
+// ============================================================================
+
+/** ICAO radiotelephony pronunciations for the digits */
+const NATO_DIGITS = Object.freeze(['zero', 'wun', 'too', 'tree', 'fower', 'fife', 'six', 'seven', 'ait', 'niner']);
+
+/**
+ * NATO / ICAO radiotelephony numerals. Digits are read one at a time
+ * (1984 → 'wun niner ait fower'); per ICAO, whole hundreds and thousands
+ * are read with 'hundred' and 'tousand' (2500 → 'too tousand fife hundred').
+ * A decimal point is 'decimal', a negative sign 'minus'.
+ * @param {number|bigint|string} n - The number
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.digits] - Always read digit by digit, even round numbers
+ * @param {string} [opt.cap] - Capitalization: 'title', 'upper', or 'lower'
+ * @returns {string|false}
+ *
+ * @example
+ * nato(1984)   // 'wun niner ait fower'
+ * nato(2500)   // 'too tousand fife hundred'
+ * nato(3.14)   // 'tree decimal wun fower'
+ */
+const nato = (n, opt) => {
+  let str;
+  if (typeof n === 'bigint') str = n.toString();
+  else if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return false;
+    str = Number.isInteger(n) ? BigInt(n).toString() : n.toString();
+    if (str.includes('e')) return false;
+  } else if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) str = n.trim();
+  else return false;
+
+  const words = [];
+  if (str.startsWith('-')) {
+    words.push('minus');
+    str = str.slice(1);
+  }
+  const [intPart, fracPart] = str.split('.');
+  const spell = (digits) => [...digits].map((d) => NATO_DIGITS[Number(d)]);
+
+  // Round hundreds / thousands: "fife hundred", "wun tousand", "too fife tousand"
+  const roundMatch = !opt?.digits && !fracPart && intPart.match(/^(\d{1,2})(\d?)(00)$/);
+  if (roundMatch && !intPart.startsWith('0') && intPart.length >= 3 && intPart.length <= 5) {
+    const thousands = intPart.slice(0, -3);
+    const hundredsDigit = intPart.slice(-3, -2);
+    if (thousands) words.push(...spell(thousands), 'tousand');
+    if (hundredsDigit !== '0') words.push(NATO_DIGITS[Number(hundredsDigit)], 'hundred');
+  } else {
+    words.push(...spell(intPart));
+    if (fracPart) words.push('decimal', ...spell(fracPart));
+  }
+
+  let result = words.join(' ');
+  if (opt?.cap) result = cap(result, opt.cap);
+  return result;
+};
+
+// ============================================================================
+// SCIENTIFIC NOTATION
+// ============================================================================
+
+/** Expand a float's exponent form ('1.5e-7') into a plain decimal string */
+const expandExponent = (str) => {
+  const negative = str.startsWith('-');
+  const [m, e] = (negative ? str.slice(1) : str).split('e');
+  const exp = Number(e);
+  const mDigits = m.replace('.', '');
+  const point = m.split('.')[0].length + exp;
+  let out;
+  if (point <= 0) out = `0.${'0'.repeat(-point)}${mDigits}`;
+  else if (point >= mDigits.length) out = `${mDigits}${'0'.repeat(point - mDigits.length)}`;
+  else out = `${mDigits.slice(0, point)}.${mDigits.slice(point)}`;
+  return (negative ? '-' : '') + out;
+};
+
+/** Normalize number | bigint | numeric string to a plain decimal string, or null */
+const toPlainDecimal = (n) => {
+  if (typeof n === 'bigint') return n.toString();
+  if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return null;
+    const str = n.toString();
+    return str.includes('e') ? expandExponent(str) : str;
+  }
+  if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) return n.trim();
+  return null;
+};
+
+/**
+ * Scientific notation with an exact decimal mantissa (no float drift).
+ * @param {number|bigint|string} n - The number
+ * @param {Object} [opt] - Options object
+ * @param {number} [opt.digits=12] - Maximum significant digits (rounds half up)
+ * @param {string} [opt.format='unicode'] - 'unicode' (1.984 × 10³), 'caret' (1.984 × 10^3),
+ *   'e' (1.984e3), or 'words' (one point nine eight four times ten to the third)
+ * @param {string} [opt.cap] - Capitalization for the words format
+ * @returns {string|false}
+ *
+ * @example
+ * scientific(1984)                      // '1.984 × 10³'
+ * scientific(0.00042)                   // '4.2 × 10⁻⁴'
+ * scientific(1984, { format: 'e' })     // '1.984e3'
+ * scientific(1984, { format: 'words' }) // 'one point nine eight four times ten to the third'
+ */
+const scientific = (n, opt) => {
+  let str = toPlainDecimal(n);
+  if (str === null) return false;
+
+  const negative = str.startsWith('-');
+  if (negative) str = str.slice(1);
+  const [rawInt, fracPart = ''] = str.split('.');
+  const intPart = rawInt.replace(/^0+/, '');
+  const all = intPart + fracPart;
+  const firstNonZero = all.search(/[1-9]/);
+
+  let exponent = 0;
+  let sig = '0';
+  if (firstNonZero !== -1) {
+    exponent = intPart ? intPart.length - 1 : -(firstNonZero + 1);
+    sig = all.slice(firstNonZero).replace(/0+$/, '') || '0';
+  }
+
+  const maxDigits = Number.isFinite(opt?.digits) ? Math.max(1, Math.min(Math.trunc(opt.digits), 36)) : 12;
+  if (sig.length > maxDigits) {
+    const rounded = BigInt(sig.slice(0, maxDigits)) + (Number(sig[maxDigits]) >= 5 ? 1n : 0n);
+    let roundedStr = rounded.toString();
+    if (roundedStr.length > maxDigits) {
+      // 999 → 1000 carries into the exponent
+      exponent++;
+      roundedStr = roundedStr.slice(0, -1);
+    }
+    sig = roundedStr.replace(/0+$/, '') || '0';
+  }
+
+  const mantissa = sig.length > 1 ? `${sig[0]}.${sig.slice(1)}` : sig;
+  const sign = negative ? '-' : '';
+  const format = opt?.format || 'unicode';
+
+  if (format === 'e') return `${sign}${mantissa}e${exponent}`;
+  if (format === 'caret') return `${sign}${mantissa} × 10^${exponent}`;
+  if (format === 'words') {
+    const mantissaWords = decimal(`${sign}${mantissa}`);
+    if (mantissaWords === false) return false;
+    let result = mantissaWords;
+    if (exponent !== 0) {
+      const power = exponent < 0 ? `negative ${ordinal(-exponent)}` : ordinal(exponent);
+      result += ` times ten to the ${power}`;
+    }
+    return opt?.cap ? cap(result, opt.cap) : result;
+  }
+  if (format !== 'unicode') return false;
+  return `${sign}${mantissa} × 10${fancy(exponent, 'superscript')}`;
+};
+
+// ============================================================================
+// RADIX (binary, octal, hex)
+// ============================================================================
+
+const RADIX_PREFIXES = Object.freeze({ 2: '0b', 8: '0o', 16: '0x' });
+
+/**
+ * Integer in another base, 2 to 36.
+ * @param {number|bigint|string} n - Integer
+ * @param {number} [base=2] - Radix, 2 to 36
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.prefix] - Add 0b / 0o / 0x for bases 2, 8, 16
+ * @param {boolean} [opt.upper] - Uppercase letter digits
+ * @param {number} [opt.pad] - Left-pad with zeros to this many digits
+ * @returns {string|false}
+ *
+ * @example
+ * radix(42)                                      // '101010'
+ * radix(42, 16)                                  // '2a'
+ * radix(255, 16, { prefix: true, upper: true })  // '0xFF'
+ */
+const radix = (n, base = 2, opt) => {
+  if (!Number.isInteger(base) || base < 2 || base > 36) return false;
+  let value;
+  if (typeof n === 'bigint') value = n;
+  else if (typeof n === 'number' && Number.isInteger(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER) value = BigInt(n);
+  else if (typeof n === 'string' && /^-?\d+$/.test(n.trim())) value = BigInt(n.trim());
+  else return false;
+
+  const negative = value < 0n;
+  let digits = (negative ? -value : value).toString(base);
+  if (opt?.upper) digits = digits.toUpperCase();
+  if (opt?.pad) digits = digits.padStart(opt.pad, '0');
+  const prefix = opt?.prefix ? (RADIX_PREFIXES[base] || '') : '';
+  return `${negative ? '-' : ''}${prefix}${digits}`;
+};
+
+/** Binary: 42 → '101010' */
+const binary = (n, opt) => radix(n, 2, opt);
+/** Octal: 42 → '52' */
+const octal = (n, opt) => radix(n, 8, opt);
+/** Hexadecimal: 42 → '2a' */
+const hex = (n, opt) => radix(n, 16, opt);
+
+// ============================================================================
+// BYTES
+// ============================================================================
+
+const BYTE_UNITS = Object.freeze({
+  decimal: ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+  binary: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
+  decimalWords: ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte', 'exabyte', 'zettabyte', 'yottabyte'],
+  binaryWords: ['byte', 'kibibyte', 'mebibyte', 'gibibyte', 'tebibyte', 'pebibyte', 'exbibyte', 'zebibyte', 'yobibyte']
+});
+
+const BIT_UNITS = Object.freeze({
+  decimal: ['b', 'kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb'],
+  binary: ['b', 'Kib', 'Mib', 'Gib', 'Tib', 'Pib', 'Eib', 'Zib', 'Yib'],
+  decimalWords: ['bit', 'kilobit', 'megabit', 'gigabit', 'terabit', 'petabit', 'exabit', 'zettabit', 'yottabit'],
+  binaryWords: ['bit', 'kibibit', 'mebibit', 'gibibit', 'tebibit', 'pebibit', 'exbibit', 'zebibit', 'yobibit']
+});
+
+/** Shared engine for bytes() and bits(): all rounding in BigInt, so precision holds at any size */
+const dataSize = (n, opt, table) => {
+  let value;
+  if (typeof n === 'bigint') value = n;
+  else if (typeof n === 'number' && Number.isInteger(n) && n <= Number.MAX_SAFE_INTEGER) value = BigInt(n);
+  else if (typeof n === 'string' && /^\d+$/.test(n.trim())) value = BigInt(n.trim());
+  else return false;
+  if (value < 0n) return false;
+
+  const step = opt?.binary ? 1024n : 1000n;
+  const units = opt?.binary ? table.binary : table.decimal;
+  const words = opt?.binary ? table.binaryWords : table.decimalWords;
+  // Clamp to a finite integer 0-6 so BigInt() cannot throw on 1.5, NaN, or Infinity
+  const digits = Number.isFinite(opt?.digits) ? Math.max(0, Math.min(Math.trunc(opt.digits), 6)) : 1;
+  const precision = 10n ** BigInt(digits);
+
+  let unit = 0;
+  let scale = 1n;
+  while (unit < units.length - 1 && value >= scale * step) {
+    scale *= step;
+    unit++;
+  }
+  // amount in units of 10^-digits, rounded half up
+  let fixed = (value * precision * 2n + scale) / (scale * 2n);
+  if (fixed >= step * precision && unit < units.length - 1) {
+    unit++;
+    scale *= step;
+    fixed = (value * precision * 2n + scale) / (scale * 2n);
+  }
+
+  const whole = (fixed / precision).toString();
+  const frac = digits ? (fixed % precision).toString().padStart(digits, '0').replace(/0+$/, '') : '';
+  const amountStr = frac ? `${whole}.${frac}` : whole;
+
+  if (opt?.long) {
+    const amountWords = frac ? decimal(amountStr) : cardinal(BigInt(whole));
+    if (amountWords === false) return false;
+    const noun = amountStr === '1' ? words[unit] : `${words[unit]}s`;
+    return `${amountWords} ${noun}`;
+  }
+  return `${amountStr} ${units[unit]}`;
+};
+
+/**
+ * Human-readable byte sizes.
+ * @param {number|bigint|string} n - Non-negative integer count of bytes
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.binary] - Use 1024 steps and KiB/MiB units
+ * @param {number} [opt.digits=1] - Maximum decimal places
+ * @param {boolean} [opt.long] - Spell it out: 'one point five kilobytes'
+ * @returns {string|false}
+ *
+ * @example
+ * bytes(1536)                   // '1.5 KB'
+ * bytes(1536, { binary: true }) // '1.5 KiB'
+ * bytes(1536, { long: true })   // 'one point five kilobytes'
+ */
+const bytes = (n, opt) => dataSize(n, opt, BYTE_UNITS);
+
+/**
+ * Human-readable bit counts (bandwidth style: kb, Mb, Gb).
+ * @param {number|bigint|string} n - Non-negative integer count of bits
+ * @param {Object} [opt] - Same options as bytes()
+ * @returns {string|false}
+ *
+ * @example
+ * bits(1500000)                 // '1.5 Mb'
+ * bits(1536, { binary: true })  // '1.5 Kib'
+ * bits(1500000, { long: true }) // 'one point five megabits'
+ */
+const bits = (n, opt) => dataSize(n, opt, BIT_UNITS);
+
+// ============================================================================
+// MORSE CODE
+// ============================================================================
+
+const MORSE_DIGITS = Object.freeze(['-----', '.----', '..---', '...--', '....-', '.....', '-....', '--...', '---..', '----.']);
+
+/**
+ * International Morse code for the digits. Digits are separated by a space,
+ * a decimal point is '.-.-.-' and a minus sign '-....-'.
+ * @param {number|bigint|string} n - The number
+ * @returns {string|false}
+ *
+ * @example
+ * morse(42)   // '....- ..---'
+ * morse(3.1)  // '...-- .-.-.- .----'
+ */
+const morse = (n) => {
+  let str;
+  if (typeof n === 'bigint') str = n.toString();
+  else if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return false;
+    str = Number.isInteger(n) ? BigInt(n).toString() : n.toString();
+    if (str.includes('e')) return false;
+  } else if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) str = n.trim();
+  else return false;
+
+  return [...str].map((ch) => {
+    if (ch === '-') return '-....-';
+    if (ch === '.') return '.-.-.-';
+    return MORSE_DIGITS[Number(ch)];
+  }).join(' ');
+};
+
+
+const negative = (n, opt) => {
+  let value;
+  if (typeof n === 'bigint') value = n;
+  else if (typeof n === 'number' && !isNaN(n)) value = n;
+  else return false;
+
+  if (value >= 0) return cardinal(value, opt);
+
+  // Case the whole phrase once; casing the inner words first would break camel/pascal
+  const inner = opt ? { ...opt, cap: undefined, punc: undefined } : opt;
+  const result = cardinal(typeof value === 'bigint' ? -value : Math.abs(value), inner);
   if (result === false) return false;
   let s = `negative ${result}`;
   if (opt?.cap) s = cap(s, opt.cap);
+  if (opt?.punc !== undefined) s = punc(s, opt.punc);
   return s;
 };
 
@@ -522,8 +1093,15 @@ const fraction = (numerator, denominator, opt) => {
 };
 
 const year = (y, opt) => {
+  // Far-future years are read as plain cardinals: "the year ten thousand"
+  if (typeof y === 'bigint') {
+    if (y < 0n) return false;
+    if (y > 9999n) return cardinal(y, opt);
+    y = Number(y);
+  }
   if (typeof y !== 'number' || isNaN(y) || !Number.isInteger(y)) return false;
-  if (y < 0 || y > 9999) return false;
+  if (y < 0) return false;
+  if (y > 9999) return cardinal(y, opt);
 
   let result;
 
@@ -561,7 +1139,8 @@ const telephone = (phone, opt) => {
   const phoneStr = String(phone).replace(/\D/g, '');
   if (!phoneStr) return false;
 
-  const digitWords = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+  // 'oh' for zero is how English speakers usually read phone numbers aloud
+  const digitWords = [opt?.oh ? 'oh' : 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
   const words = phoneStr.split('').map(d => digitWords[parseInt(d, 10)]);
 
   let result = words.join(' ');
@@ -601,7 +1180,7 @@ const percent = (pct, opt) => {
  * @returns {string|false} The word representation
  */
 const toWords = (n, opt) => {
-  const lang = opt?.lang?.toLowerCase() || 'en';
+  const lang = typeof opt?.lang === 'string' ? opt.lang.toLowerCase() : 'en';
   const langKey = LANGUAGES[lang] || 'english';
 
   let result;
@@ -622,7 +1201,7 @@ const toWords = (n, opt) => {
       result = danish(n);
       break;
     case 'chinese':
-      result = chinese(n);
+      result = chinese(n, opt);
       break;
     case 'hindi':
       result = hindi(n);
@@ -634,7 +1213,7 @@ const toWords = (n, opt) => {
       result = portuguese(n);
       break;
     case 'japanese':
-      result = japanese(n);
+      result = japanese(n, opt);
       break;
     case 'korean':
       result = korean(n);
@@ -696,5 +1275,18 @@ export {
   year,
   telephone,
   percent,
+  nth,
+  compact,
+  nato,
+  nato as icao,
+  nato as military,
+  morse,
+  scientific,
+  radix,
+  binary,
+  octal,
+  hex,
+  bytes,
+  bits,
   toWords
 };

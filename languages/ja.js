@@ -94,7 +94,7 @@ const japanese = (n, opt) => {
     return false;
   }
 
-  if (num === 0n) return 'ゼロ';
+  if (num === 0n) return formal ? '零' : 'ゼロ';
 
   const str = num.toString();
   const len = str.length;

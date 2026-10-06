@@ -270,6 +270,8 @@ describe('formal Chinese and Japanese numerals', () => {
     expect(japanese(1000, { formal: true })).toBe('壱千');
     expect(japanese(1001, { formal: true })).toBe('壱千壱');
     expect(japanese(123456, { formal: true })).toBe('壱拾弐万参千四百五拾六');
+    expect(japanese(0, { formal: true })).toBe('零');
+    expect(japanese(0)).toBe('ゼロ');
   });
 
   it('is off by default and reachable through toWords', () => {
@@ -463,6 +465,11 @@ describe('bytes', () => {
     expect(bytes(10n ** 30n)).toBe('1000000 YB');
     expect(bytes(1999, { digits: 0 })).toBe('2 KB');
     expect(bytes(999999999, { digits: 2 })).toBe('1 GB');
+    expect(bytes(1536, { digits: 1.5 })).toBe('1.5 KB');
+    expect(bytes(1536, { digits: NaN })).toBe('1.5 KB');
+    expect(bits(1536, { digits: Infinity })).toBe('1.536 kb');
+    expect(compact(1536, { digits: 2.7 })).toBe('1.54K');
+    expect(scientific(1984, { digits: 2.9 })).toBe('2 × 10³');
     expect(bytes(-1)).toBe(false);
     expect(bytes(1.5)).toBe(false);
     expect(bytes('abc')).toBe(false);

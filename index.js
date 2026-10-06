@@ -688,7 +688,7 @@ const compact = (n, opt) => {
   const [rawInt, fracPart = ''] = str.split('.');
   // Leading zeros carry no magnitude: '0001000' is 1000
   const intPart = rawInt.replace(/^0+(?=\d)/, '');
-  const digits = Math.max(0, Math.min(opt?.digits ?? 1, 6));
+  const digits = Number.isFinite(opt?.digits) ? Math.max(0, Math.min(Math.trunc(opt.digits), 6)) : 1;
 
   if (intPart.length < 4) {
     const small = Number(`${intPart}.${fracPart || '0'}`);
@@ -835,7 +835,7 @@ const scientific = (n, opt) => {
     sig = all.slice(firstNonZero).replace(/0+$/, '') || '0';
   }
 
-  const maxDigits = Math.max(1, Math.min(opt?.digits ?? 12, 36));
+  const maxDigits = Number.isFinite(opt?.digits) ? Math.max(1, Math.min(Math.trunc(opt.digits), 36)) : 12;
   if (sig.length > maxDigits) {
     const rounded = BigInt(sig.slice(0, maxDigits)) + (Number(sig[maxDigits]) >= 5 ? 1n : 0n);
     let roundedStr = rounded.toString();
@@ -941,7 +941,8 @@ const dataSize = (n, opt, table) => {
   const step = opt?.binary ? 1024n : 1000n;
   const units = opt?.binary ? table.binary : table.decimal;
   const words = opt?.binary ? table.binaryWords : table.decimalWords;
-  const digits = Math.max(0, Math.min(opt?.digits ?? 1, 6));
+  // Clamp to a finite integer 0-6 so BigInt() cannot throw on 1.5, NaN, or Infinity
+  const digits = Number.isFinite(opt?.digits) ? Math.max(0, Math.min(Math.trunc(opt.digits), 6)) : 1;
   const precision = 10n ** BigInt(digits);
 
   let unit = 0;

@@ -467,7 +467,7 @@ describe('bytes', () => {
     expect(bytes(999999999, { digits: 2 })).toBe('1 GB');
     expect(bytes(1536, { digits: 1.5 })).toBe('1.5 KB');
     expect(bytes(1536, { digits: NaN })).toBe('1.5 KB');
-    expect(bits(1536, { digits: Infinity })).toBe('1.536 kb');
+    expect(bits(1536, { digits: Infinity })).toBe('1.5 kb');
     expect(compact(1536, { digits: 2.7 })).toBe('1.54K');
     expect(scientific(1984, { digits: 2.9 })).toBe('2 × 10³');
     expect(bytes(-1)).toBe(false);

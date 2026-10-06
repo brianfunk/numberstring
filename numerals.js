@@ -1,7 +1,8 @@
 /**
  * Alternative numeral systems and Unicode digit styles.
- * Everything here is pure, table-driven, and renders with Unicode glyphs,
- * so results depend on the viewer having a font that covers the block.
+ * Everything here is pure, table-driven, and renders with Unicode glyphs.
+ * Only blocks with broad system-font coverage are included (Mayan numerals
+ * and tally marks were dropped for lack of fonts on macOS).
  * @module numerals
  */
 
@@ -153,41 +154,6 @@ const babylonian = (n) => {
 };
 
 // ============================================================================
-// MAYAN
-// ============================================================================
-
-/** Unicode Mayan numerals 0-19 (U+1D2E0 .. U+1D2F3) */
-const MAYAN_DIGITS = Object.freeze([...'𝋠𝋡𝋢𝋣𝋤𝋥𝋦𝋧𝋨𝋩𝋪𝋫𝋬𝋭𝋮𝋯𝋰𝋱𝋲𝋳']);
-
-/**
- * Mayan vigesimal (base 20) numerals using the Unicode Mayan Numerals block.
- * Pure base 20 (the calendar's 18-based third place is not applied).
- * Most significant digit first; pass `{ vertical: true }` to stack with
- * newlines the way the Maya wrote them.
- * @param {number|bigint|string} n - Non-negative integer
- * @param {Object} [opt]
- * @param {boolean} [opt.vertical] - Join places with newlines
- * @returns {string|false}
- *
- * @example
- * mayan(42)  // '𝋢𝋢'  (2 twenties + 2)
- * mayan(0)   // '𝋠'
- */
-const mayan = (n, opt) => {
-  const count = toCount(n);
-  if (count === null) return false;
-  if (count === 0n) return MAYAN_DIGITS[0];
-
-  const places = [];
-  let rest = count;
-  while (rest > 0n) {
-    places.unshift(MAYAN_DIGITS[Number(rest % 20n)]);
-    rest /= 20n;
-  }
-  return places.join(opt?.vertical ? '\n' : '');
-};
-
-// ============================================================================
 // GREEK (IONIC / MILESIAN)
 // ============================================================================
 
@@ -220,32 +186,4 @@ const greek = (n) => {
   return out + GREEK_KERAIA;
 };
 
-// ============================================================================
-// TALLY MARKS
-// ============================================================================
-
-const TALLY_FIVE = '𝍸';
-const TALLY_ONE = '𝍷';
-/** Keep tally output to something a page can show */
-const TALLY_MAX = 1000n;
-
-/**
- * Tally marks in groups of five using the Unicode tally glyphs.
- * @param {number|bigint|string} n - Integer from 0 to 1000
- * @returns {string|false}
- *
- * @example
- * tally(7)  // '𝍸 𝍷𝍷'
- * tally(0)  // ''
- */
-const tally = (n) => {
-  const count = toCount(n);
-  if (count === null || count > TALLY_MAX) return false;
-  const v = Number(count);
-  const groups = [];
-  for (let i = 0; i < Math.floor(v / 5); i++) groups.push(TALLY_FIVE);
-  if (v % 5) groups.push(TALLY_ONE.repeat(v % 5));
-  return groups.join(' ');
-};
-
-export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, mayan, greek, tally };
+export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek };

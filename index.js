@@ -21,11 +21,11 @@
 // Import language functions
 import { english, spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic, LANGUAGES } from './languages/index.js';
 
-import { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, mayan, greek, tally } from './numerals.js';
+import { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek } from './numerals.js';
 
 // Re-export language functions and alternative numeral systems
 export { spanish, french, german, danish, chinese, hindi, russian, portuguese, japanese, korean, arabic, italian, dutch, turkish, polish, swedish, indonesian, thai, norwegian, finnish, icelandic };
-export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, mayan, greek, tally };
+export { fancy, FANCY_STYLE_NAMES, egyptian, babylonian, greek };
 
 // ============================================================================
 // CONSTANTS

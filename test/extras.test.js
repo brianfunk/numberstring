@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import numberstring, {
   ordinal, nth, compact, fancy, FANCY_STYLE_NAMES,
-  egyptian, babylonian, mayan, greek, tally,
+  egyptian, babylonian, greek,
   chinese, japanese, toWords
 } from '../index.js';
 
@@ -222,26 +222,6 @@ describe('babylonian', () => {
   });
 });
 
-describe('mayan', () => {
-  it('writes base-20 digits most significant first', () => {
-    expect(mayan(0)).toBe('𝋠');
-    expect(mayan(19)).toBe('𝋳');
-    expect(mayan(20)).toBe('𝋡𝋠');
-    expect(mayan(42)).toBe('𝋢𝋢');
-    expect(mayan(400)).toBe('𝋡𝋠𝋠');
-    expect(mayan(1984)).toBe('𝋤𝋳𝋤');
-  });
-
-  it('stacks vertically on request', () => {
-    expect(mayan(1984, { vertical: true })).toBe('𝋤\n𝋳\n𝋤');
-  });
-
-  it('rejects invalid input', () => {
-    expect(mayan(-1)).toBe(false);
-    expect(mayan(2.5)).toBe(false);
-  });
-});
-
 describe('greek', () => {
   it('uses Ionic letters with keraia', () => {
     expect(greek(1)).toBe('αʹ');
@@ -258,23 +238,6 @@ describe('greek', () => {
     expect(greek(0)).toBe(false);
     expect(greek(10000)).toBe(false);
     expect(greek(-5)).toBe(false);
-  });
-});
-
-describe('tally', () => {
-  it('groups by five', () => {
-    expect(tally(0)).toBe('');
-    expect(tally(1)).toBe('𝍷');
-    expect(tally(4)).toBe('𝍷𝍷𝍷𝍷');
-    expect(tally(5)).toBe('𝍸');
-    expect(tally(7)).toBe('𝍸 𝍷𝍷');
-    expect(tally(12)).toBe('𝍸 𝍸 𝍷𝍷');
-  });
-
-  it('rejects negatives, fractions, and more than 1000', () => {
-    expect(tally(-1)).toBe(false);
-    expect(tally(1.5)).toBe(false);
-    expect(tally(1001)).toBe(false);
   });
 });
 

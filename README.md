@@ -22,7 +22,7 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Huge range** - Supports 0 to decillions (10^36) with BigInt
 - **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers
 - **Roman numerals** - Classic and vinculum notation to 3,999,999,999
-- **Ancient and alternative numerals** - Egyptian, Babylonian, Mayan, Greek, tally marks, Chinese/Japanese financial forms
+- **Ancient and alternative numerals** - Egyptian hieroglyphs, Babylonian cuneiform, Greek letters, Chinese/Japanese financial forms
 - **Unicode digit styles** - ④② ⁴² ４２ 𝟜𝟚 4️⃣2️⃣ ⠼⠙⠃
 - **Forgiving input** - Integers, negatives, decimals, numeric strings, BigInt. It just works
 - **Well tested** - 700+ tests with 90%+ coverage, including per-language spot checks
@@ -182,16 +182,13 @@ fancy(-3.5, 'braille');      // '⠼⠤⠉⠨⠑'
 All render with Unicode glyphs, so they need a font that covers the block (most modern systems do).
 
 ```javascript
-import { egyptian, babylonian, mayan, greek, tally } from 'numberstring';
+import { egyptian, babylonian, greek } from 'numberstring';
 
 egyptian(42);     // '𓎆𓎆𓎆𓎆𓏺𓏺'       additive, 1 to 9,999,999
 babylonian(42);   // '𒌋𒌋𒌋𒌋𒐕𒐕'       base 60, places separated by spaces
 babylonian(3600); // '𒐕 𒑊 𒑊'
-mayan(42);        // '𝋢𝋢'             base 20, most significant first
-mayan(1984, { vertical: true });  // stacked with newlines
 greek(42);        // 'μβʹ'             Ionic letters, 1 to 9999
 greek(1999);      // '͵αϡϟθʹ'
-tally(7);         // '𝍸 𝍷𝍷'           groups of five, 0 to 1000
 ```
 
 Chinese and Japanese also have the anti-fraud financial forms used on cheques:

@@ -56,10 +56,6 @@ export interface CompactOptions {
   long?: boolean;
 }
 
-export interface MayanOptions {
-  /** Stack places top to bottom with newlines */
-  vertical?: boolean;
-}
 
 /** Unicode digit styles accepted by fancy() */
 export type FancyStyle =
@@ -119,14 +115,10 @@ export function egyptian(n: Numeric): string | false;
 /** Babylonian base-60 cuneiform numerals */
 export function babylonian(n: Numeric): string | false;
 
-/** Mayan base-20 numerals, most significant first */
-export function mayan(n: Numeric, opt?: MayanOptions): string | false;
-
 /** Greek Ionic alphabetic numerals, 1 to 9999 */
 export function greek(n: Numeric): string | false;
 
-/** Tally marks in groups of five, 0 to 1000 */
-export function tally(n: Numeric): string | false;
+
 
 /** Decimal words: 3.14 → 'three point one four' */
 export function decimal(n: number | string, opt?: Pick<Options, 'cap' | 'point'>): Result;

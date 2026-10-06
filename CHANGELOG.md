@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`nth(n)`** - Numeric ordinal suffix: `1st`, `22nd`, `113th`.
 - **`compact(n, opt)`** - `1.5K`, `2.3B`, `1Sx`, with `digits` and `long` ("1.5 million") options.
 - **`fancy(n, style)`** - Digits in Unicode styles: circled ④②, superscript ⁴², subscript, fullwidth, bold, doublestruck 𝟜𝟚, sans, monospace, keycap 4️⃣2️⃣, braille ⠼⠙⠃.
-- **Alternative numeral systems** in `numerals.js`: `egyptian()` hieroglyphs (to 9,999,999), `babylonian()` base-60 cuneiform, `mayan()` base-20, `greek()` Ionic letters (to 9999), `tally()` marks.
+- **Alternative numeral systems** in `numerals.js`: `egyptian()` hieroglyphs (to 9,999,999), `babylonian()` base-60 cuneiform, `greek()` Ionic letters (to 9999). Mayan numerals and tally marks were tried and dropped: no system font on macOS.
 - **Financial numerals** - `chinese(n, { formal: true })` → 壹仟零壹 (大写), `japanese(n, { formal: true })` → 壱千壱 (大字). Also via `toWords(n, { lang: 'zh', formal: true })`.
 - `roman()` now supports vinculum notation above 3999 (a bar multiplies by 1000, two bars by a million), up to 3,999,999,999.
 - Open Graph and Twitter card tags on the playground, with a PNG preview image (`site/og.png`, rendered from `site/og.svg`).

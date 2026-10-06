@@ -1,6 +1,6 @@
 import numberstring, {
   comma, ordinal, roman, year, currency, telephone, fraction,
-  nth, compact, fancy, egyptian, babylonian, mayan, greek, tally, chinese, japanese
+  nth, compact, fancy, egyptian, babylonian, greek, chinese, japanese
 } from './lib/index.js';
 
 const LANGS = [
@@ -111,9 +111,7 @@ const render = (raw) => {
   row('braille', fancy(parsed.str, 'braille'));
   row('egyptian', wholeInt ? egyptian(value) : false, 'glyphs');
   row('babylonian', wholeInt ? babylonian(value) : false, 'glyphs');
-  row('mayan', wholeInt ? mayan(value) : false, 'glyphs');
   row('greek', wholeInt ? greek(value) : false, 'glyphs');
-  row('tally', wholeInt ? tally(value) : false, 'glyphs');
 
   for (const [code, name] of LANGS) {
     const tr = document.createElement('tr');

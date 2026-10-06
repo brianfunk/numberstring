@@ -672,8 +672,96 @@ const compact = (n, opt) => {
 };
 
 // ============================================================================
-// ADDITIONAL UTILITY FUNCTIONS
+// NATO / ICAO PHONETIC NUMERALS
 // ============================================================================
+
+/** ICAO radiotelephony pronunciations for the digits */
+const NATO_DIGITS = Object.freeze(['zero', 'wun', 'too', 'tree', 'fower', 'fife', 'six', 'seven', 'ait', 'niner']);
+
+/**
+ * NATO / ICAO radiotelephony numerals. Digits are read one at a time
+ * (1984 → 'wun niner ait fower'); per ICAO, whole hundreds and thousands
+ * are read with 'hundred' and 'tousand' (2500 → 'too tousand fife hundred').
+ * A decimal point is 'decimal', a negative sign 'minus'.
+ * @param {number|bigint|string} n - The number
+ * @param {Object} [opt] - Options object
+ * @param {boolean} [opt.digits] - Always read digit by digit, even round numbers
+ * @param {string} [opt.cap] - Capitalization: 'title', 'upper', or 'lower'
+ * @returns {string|false}
+ *
+ * @example
+ * nato(1984)   // 'wun niner ait fower'
+ * nato(2500)   // 'too tousand fife hundred'
+ * nato(3.14)   // 'tree decimal wun fower'
+ */
+const nato = (n, opt) => {
+  let str;
+  if (typeof n === 'bigint') str = n.toString();
+  else if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return false;
+    str = Number.isInteger(n) ? BigInt(n).toString() : n.toString();
+    if (str.includes('e')) return false;
+  } else if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) str = n.trim();
+  else return false;
+
+  const words = [];
+  if (str.startsWith('-')) {
+    words.push('minus');
+    str = str.slice(1);
+  }
+  const [intPart, fracPart] = str.split('.');
+  const spell = (digits) => [...digits].map((d) => NATO_DIGITS[Number(d)]);
+
+  // Round hundreds / thousands: "fife hundred", "wun tousand", "too fife tousand"
+  const roundMatch = !opt?.digits && !fracPart && intPart.match(/^(\d{1,2})(\d?)(00)$/);
+  if (roundMatch && intPart !== '0' && intPart.length >= 3 && intPart.length <= 5) {
+    const thousands = intPart.slice(0, -3);
+    const hundredsDigit = intPart.slice(-3, -2);
+    if (thousands) words.push(...spell(thousands), 'tousand');
+    if (hundredsDigit !== '0') words.push(NATO_DIGITS[Number(hundredsDigit)], 'hundred');
+  } else {
+    words.push(...spell(intPart));
+    if (fracPart) words.push('decimal', ...spell(fracPart));
+  }
+
+  let result = words.join(' ');
+  if (opt?.cap) result = cap(result, opt.cap);
+  return result;
+};
+
+// ============================================================================
+// MORSE CODE
+// ============================================================================
+
+const MORSE_DIGITS = Object.freeze(['-----', '.----', '..---', '...--', '....-', '.....', '-....', '--...', '---..', '----.']);
+
+/**
+ * International Morse code for the digits. Digits are separated by a space,
+ * a decimal point is '.-.-.-' and a minus sign '-....-'.
+ * @param {number|bigint|string} n - The number
+ * @returns {string|false}
+ *
+ * @example
+ * morse(42)   // '....- ..---'
+ * morse(3.1)  // '...-- .-.-.- .----'
+ */
+const morse = (n) => {
+  let str;
+  if (typeof n === 'bigint') str = n.toString();
+  else if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return false;
+    str = Number.isInteger(n) ? BigInt(n).toString() : n.toString();
+    if (str.includes('e')) return false;
+  } else if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) str = n.trim();
+  else return false;
+
+  return [...str].map((ch) => {
+    if (ch === '-') return '-....-';
+    if (ch === '.') return '.-.-.-';
+    return MORSE_DIGITS[Number(ch)];
+  }).join(' ');
+};
+
 
 const negative = (n, opt) => {
   if (typeof n === 'bigint') {
@@ -775,7 +863,8 @@ const telephone = (phone, opt) => {
   const phoneStr = String(phone).replace(/\D/g, '');
   if (!phoneStr) return false;
 
-  const digitWords = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+  // 'oh' for zero is how English speakers usually read phone numbers aloud
+  const digitWords = [opt?.oh ? 'oh' : 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
   const words = phoneStr.split('').map(d => digitWords[parseInt(d, 10)]);
 
   let result = words.join(' ');
@@ -912,5 +1001,9 @@ export {
   percent,
   nth,
   compact,
+  nato,
+  nato as icao,
+  nato as military,
+  morse,
   toWords
 };

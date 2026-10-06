@@ -1,6 +1,6 @@
 import numberstring, {
   comma, ordinal, roman, year, currency, telephone, fraction,
-  nth, compact, fancy, egyptian, babylonian, greek, chinese, japanese
+  nth, compact, fancy, egyptian, babylonian, greek, chinese, japanese, nato, morse
 } from './lib/index.js';
 
 const LANGS = [
@@ -96,7 +96,9 @@ const render = (raw) => {
   row('roman', smallInt && value >= 1 && value <= 3999999999 ? roman(value) : false, 'roman');
   row('year', smallInt && value >= 1000 && value <= 9999 ? year(value) : false);
   row('currency', !negative && typeof value === 'number' && value < 1e15 ? currency(`$${parsed.str}`) : false);
-  row('telephone', wholeInt && parsed.magnitude <= 15 ? telephone(parsed.str) : false);
+  row('telephone', wholeInt && parsed.magnitude <= 15 ? telephone(parsed.str, { oh: true }) : false);
+  row('pilot', nato(parsed.str));
+  row('morse', morse(parsed.str), 'roman');
   row('fraction', smallInt && value >= 2 ? `1/${value} = ${fraction(1, value)}` : false);
   row('british', wholeInt ? numberstring(value, { and: true }) : false);
   row('nth', wholeInt ? nth(value) : false);

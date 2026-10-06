@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`fancy(n, style)`** - Digits in Unicode styles: circled ④②, superscript ⁴², subscript, fullwidth, bold, doublestruck 𝟜𝟚, sans, monospace, keycap 4️⃣2️⃣, braille ⠼⠙⠃.
 - **Alternative numeral systems** in `numerals.js`: `egyptian()` hieroglyphs (to 9,999,999), `babylonian()` base-60 cuneiform, `greek()` Ionic letters (to 9999). Mayan numerals and tally marks were tried and dropped: no system font on macOS.
 - **Financial numerals** - `chinese(n, { formal: true })` → 壹仟零壹 (大写), `japanese(n, { formal: true })` → 壱千壱 (大字). Also via `toWords(n, { lang: 'zh', formal: true })`.
+- **`nato(n)`** (aliases `icao`, `military`) - ICAO radiotelephony numerals: `1984` → "wun niner ait fower", `2500` → "too tousand fife hundred", `121.5` → "wun too wun decimal fife".
+- **`morse(n)`** - International Morse code digits.
+- `telephone(n, { oh: true })` says "oh" for zero.
 - `roman()` now supports vinculum notation above 3999 (a bar multiplies by 1000, two bars by a million), up to 3,999,999,999.
 - Open Graph and Twitter card tags on the playground, with a PNG preview image (`site/og.png`, rendered from `site/og.svg`).
 - `bahasa` accepted as an alias for Indonesian.

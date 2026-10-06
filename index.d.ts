@@ -141,8 +141,28 @@ export function fraction(numerator: number, denominator: number, opt?: Pick<Opti
 /** Year as spoken: 1984 → 'nineteen eighty-four' */
 export function year(y: number, opt?: Pick<Options, 'cap'>): Result;
 
+export interface TelephoneOptions extends Pick<Options, 'cap'> {
+  /** Say 'oh' instead of 'zero' */
+  oh?: boolean;
+}
+
 /** Digits read individually: '555-1234' → 'five five five one two three four' */
-export function telephone(phone: number | string, opt?: Pick<Options, 'cap'>): Result;
+export function telephone(phone: number | string, opt?: TelephoneOptions): Result;
+
+export interface NatoOptions extends Pick<Options, 'cap'> {
+  /** Always read digit by digit, even round hundreds and thousands */
+  digits?: boolean;
+}
+
+/** ICAO / NATO radiotelephony numerals: 1984 → 'wun niner ait fower', 2500 → 'too tousand fife hundred' */
+export function nato(n: Numeric, opt?: NatoOptions): Result;
+/** Alias of nato() */
+export function icao(n: Numeric, opt?: NatoOptions): Result;
+/** Alias of nato() */
+export function military(n: Numeric, opt?: NatoOptions): Result;
+
+/** International Morse code digits: 42 → '....- ..---' */
+export function morse(n: Numeric): string | false;
 
 /** Percent words: 50 → 'fifty percent' */
 export function percent(pct: number | string, opt?: Pick<Options, 'cap'>): Result;

@@ -20,7 +20,7 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Zero dependencies** - Lightweight and fast
 - **22 languages** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian, Portuguese, Japanese, Korean, Arabic, Italian, Dutch, Turkish, Polish, Swedish, Indonesian, Thai, Norwegian, Finnish, Icelandic
 - **Huge range** - Supports 0 to decillions (10^36) with BigInt
-- **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers
+- **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers, NATO/ICAO radio numerals, Morse code
 - **Roman numerals** - Classic and vinculum notation to 3,999,999,999
 - **Ancient and alternative numerals** - Egyptian hieroglyphs, Babylonian cuneiform, Greek letters, Chinese/Japanese financial forms
 - **Unicode digit styles** - ④② ⁴² ４２ 𝟜𝟚 4️⃣2️⃣ ⠼⠙⠃
@@ -244,8 +244,33 @@ Convert phone numbers to words.
 ```javascript
 import { telephone } from 'numberstring';
 
-telephone('555-1234');  // 'five five five one two three four'
-telephone(8675309);     // 'eight six seven five three zero nine'
+telephone('555-1234');              // 'five five five one two three four'
+telephone(8675309);                 // 'eight six seven five three zero nine'
+telephone(8675309, { oh: true });   // 'eight six seven five three oh nine'
+```
+
+#### `nato(n, [options])`
+
+ICAO / NATO radiotelephony numerals, the way pilots and air traffic control read numbers. Also exported as `icao` and `military`.
+
+```javascript
+import { nato } from 'numberstring';
+
+nato(1984);                   // 'wun niner ait fower'
+nato(2500);                   // 'too tousand fife hundred'
+nato('121.5');                // 'wun too wun decimal fife'
+nato(2500, { digits: true }); // 'too fife zero zero'
+```
+
+#### `morse(n)`
+
+International Morse code for the digits.
+
+```javascript
+import { morse } from 'numberstring';
+
+morse(42);   // '....- ..---'
+morse(3.1);  // '...-- .-.-.- .----'
 ```
 
 #### `percent(pct, [options])`

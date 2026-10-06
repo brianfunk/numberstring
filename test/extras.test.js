@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import numberstring, {
-  ordinal, nth, compact, fancy, FANCY_STYLE_NAMES,
+  ordinal, nth, compact, fancy, FANCY_STYLE_NAMES, nato, icao, military, morse, telephone,
   egyptian, babylonian, greek,
   chinese, japanese, toWords
 } from '../index.js';
@@ -278,5 +278,73 @@ describe('formal Chinese and Japanese numerals', () => {
 describe('language aliases', () => {
   it('accepts bahasa for Indonesian', () => {
     expect(numberstring(42, { lang: 'bahasa' })).toBe('empat puluh dua');
+  });
+});
+
+describe('nato', () => {
+  it('reads digits with ICAO pronunciations', () => {
+    expect(nato(1984)).toBe('wun niner ait fower');
+    expect(nato(42)).toBe('fower too');
+    expect(nato(0)).toBe('zero');
+    expect(nato('007')).toBe('zero zero seven');
+    expect(nato(10000)).toBe('wun zero tousand');
+  });
+
+  it('reads whole hundreds and thousands as words', () => {
+    expect(nato(500)).toBe('fife hundred');
+    expect(nato(1000)).toBe('wun tousand');
+    expect(nato(2500)).toBe('too tousand fife hundred');
+    expect(nato(11000)).toBe('wun wun tousand');
+    expect(nato(25000)).toBe('too fife tousand');
+    expect(nato(100000)).toBe('wun zero zero zero zero zero');
+  });
+
+  it('handles decimals, negatives, BigInt, and options', () => {
+    expect(nato(3.14)).toBe('tree decimal wun fower');
+    expect(nato('123.45')).toBe('wun too tree decimal fower fife');
+    expect(nato(-7)).toBe('minus seven');
+    expect(nato(10n ** 3n)).toBe('wun tousand');
+    expect(nato(2500, { digits: true })).toBe('too fife zero zero');
+    expect(nato(1984, { cap: 'upper' })).toBe('WUN NINER AIT FOWER');
+  });
+
+  it('is also exported as icao and military', () => {
+    expect(icao).toBe(nato);
+    expect(military).toBe(nato);
+  });
+
+  it('rejects invalid input', () => {
+    expect(nato('abc')).toBe(false);
+    expect(nato(NaN)).toBe(false);
+    expect(nato(Infinity)).toBe(false);
+    expect(nato(null)).toBe(false);
+  });
+});
+
+describe('morse', () => {
+  it('encodes digits', () => {
+    expect(morse(0)).toBe('-----');
+    expect(morse(42)).toBe('....- ..---');
+    expect(morse('1984')).toBe('.---- ----. ---.. ....-');
+    expect(morse(10n ** 3n)).toBe('.---- ----- ----- -----');
+  });
+
+  it('encodes point and minus', () => {
+    expect(morse(3.1)).toBe('...-- .-.-.- .----');
+    expect(morse(-5)).toBe('-....- .....');
+  });
+
+  it('rejects invalid input', () => {
+    expect(morse('sos')).toBe(false);
+    expect(morse(NaN)).toBe(false);
+    expect(morse(Infinity)).toBe(false);
+  });
+});
+
+describe('telephone oh option', () => {
+  it('says oh for zero', () => {
+    expect(telephone('555-0100', { oh: true })).toBe('five five five oh one oh oh');
+    expect(telephone('555-0100')).toBe('five five five zero one zero zero');
+    expect(telephone(8675309, { oh: true, cap: 'title' })).toBe('Eight Six Seven Five Three Oh Nine');
   });
 });

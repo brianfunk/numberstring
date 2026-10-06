@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import numberstring, {
   ordinal, nth, compact, fancy, FANCY_STYLE_NAMES, nato, icao, military, morse, telephone,
-  scientific, radix, binary, octal, hex, bytes, bits, clock, CAP_STYLES, roman, decimal, currency,
+  scientific, radix, binary, octal, hex, bytes, bits, clock, CAP_STYLES, roman, decimal, currency, year,
   egyptian, babylonian, greek,
   chinese, japanese, toWords
 } from '../index.js';
@@ -558,5 +558,21 @@ describe('cap casing styles', () => {
     expect(CAP_STYLES).toContain('hyphen');
     expect(CAP_STYLES).toContain('screaming');
     expect(roman(4, { lower: true })).toBe('iv');
+  });
+});
+
+describe('year beyond 9999', () => {
+  it('reads far-future years as cardinals', () => {
+    expect(year(10000)).toBe('ten thousand');
+    expect(year(8675309)).toBe('eight million six hundred seventy-five thousand three hundred nine');
+    expect(year(10n ** 6n)).toBe('one million');
+    expect(year(1984n)).toBe('nineteen eighty-four');
+    expect(year(12345, { cap: 'title' })).toBe('Twelve Thousand Three Hundred Forty-Five');
+  });
+
+  it('still rejects negatives and non-integers', () => {
+    expect(year(-1)).toBe(false);
+    expect(year(-1n)).toBe(false);
+    expect(year(1.5)).toBe(false);
   });
 });

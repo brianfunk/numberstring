@@ -1002,7 +1002,7 @@ describe('year', () => {
 
   it('returns false for invalid years', () => {
     expect(year(-1)).toBe(false);
-    expect(year(10000)).toBe(false);
+    expect(year(10000)).toBe('ten thousand');
     expect(year(3.14)).toBe(false);
   });
 });

@@ -95,7 +95,7 @@ const render = (raw) => {
   row('comma', isDecimal ? false : comma(value));
   row('ordinal', wholeInt && value !== 0 && value !== 0n ? ordinal(value) : false);
   row('roman', smallInt && value >= 1 && value <= 3999999999 ? roman(value) : false, 'roman');
-  row('year', smallInt && value >= 1 && value <= 9999 ? year(value) : false);
+  row('year', wholeInt && value >= 1 ? year(value) : false);
   row('currency', !negative && typeof value === 'number' && value < 1e15 ? currency(`$${parsed.str}`) : false);
   row('telephone', wholeInt && parsed.magnitude <= 15 ? telephone(parsed.str, { oh: true }) : false);
   row('pilot', nato(parsed.str));

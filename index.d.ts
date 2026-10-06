@@ -168,8 +168,8 @@ export function negative(n: number | bigint, opt?: Pick<Options, 'cap'>): Result
 /** Fraction words: (1, 2) → 'one half', (3, 4) → 'three quarters' */
 export function fraction(numerator: number, denominator: number, opt?: Pick<Options, 'cap'>): Result;
 
-/** Year as spoken: 1984 → 'nineteen eighty-four' */
-export function year(y: number, opt?: Pick<Options, 'cap'>): Result;
+/** Year as spoken: 1984 → 'nineteen eighty-four'; beyond 9999 reads as a cardinal */
+export function year(y: number | bigint, opt?: Pick<Options, 'cap'>): Result;
 
 export interface TelephoneOptions extends Pick<Options, 'cap'> {
   /** Say 'oh' instead of 'zero' */

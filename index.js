@@ -1078,8 +1078,15 @@ const fraction = (numerator, denominator, opt) => {
 };
 
 const year = (y, opt) => {
+  // Far-future years are read as plain cardinals: "the year ten thousand"
+  if (typeof y === 'bigint') {
+    if (y < 0n) return false;
+    if (y > 9999n) return cardinal(y, opt);
+    y = Number(y);
+  }
   if (typeof y !== 'number' || isNaN(y) || !Number.isInteger(y)) return false;
-  if (y < 0 || y > 9999) return false;
+  if (y < 0) return false;
+  if (y > 9999) return cardinal(y, opt);
 
   let result;
 

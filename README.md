@@ -278,9 +278,10 @@ Convert years to spoken form.
 ```javascript
 import { year } from 'numberstring';
 
-year(1984);  // 'nineteen eighty-four'
-year(2000);  // 'two thousand'
-year(2024);  // 'twenty twenty-four'
+year(1984);     // 'nineteen eighty-four'
+year(2000);     // 'two thousand'
+year(2024);     // 'twenty twenty-four'
+year(8675309);  // 'eight million six hundred seventy-five thousand three hundred nine'
 ```
 
 #### `telephone(phone, [options])`

@@ -159,6 +159,7 @@ describe('fancy', () => {
       monospace: '𝟺𝟸',
       keycap: '4️⃣2️⃣',
       emoji: '4️⃣2️⃣',
+      clock: '🕓🕑',
       braille: '⠼⠙⠃'
     };
     expect([...FANCY_STYLE_NAMES].sort()).toEqual(Object.keys(expected).sort());
@@ -172,6 +173,8 @@ describe('fancy', () => {
     expect(fancy(-3.5, 'superscript')).toBe('⁻³˙⁵');
     expect(fancy(-3.5, 'braille')).toBe('⠼⠤⠉⠨⠑');
     expect(fancy('-42', 'circled')).toBe('−④②');
+    expect(fancy(814, 'clock')).toBe('🕗🕐🕓');
+    expect(fancy(10.5, 'clock')).toBe('🕐🕛·🕔');
   });
 
   it('handles BigInt and exponent-form integers', () => {

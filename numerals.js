@@ -50,6 +50,8 @@ const FANCY_STYLES = Object.freeze({
   monospace: { digits: '𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿', minus: '−', point: '.' },
   keycap: { digits: ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'], minus: '➖', point: '.' },
   emoji: { digits: ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'], minus: '➖', point: '.' },
+  // Clock faces: 1-9 o'clock, with 12 o'clock standing in for 0
+  clock: { digits: '🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘', minus: '−', point: '·' },
   // Braille: numeric indicator ⠼ then a-j, decimal point ⠨, minus ⠤
   braille: { digits: '⠚⠁⠃⠉⠙⠑⠋⠛⠓⠊', minus: '⠤', point: '⠨', prefix: '⠼' }
 });
@@ -61,7 +63,7 @@ const FANCY_STYLE_NAMES = Object.freeze(Object.keys(FANCY_STYLES));
  * Render a number's digits in a Unicode style.
  * @param {number|bigint|string} n - The number
  * @param {string} [style='circled'] - One of circled, superscript, subscript,
- *   fullwidth, bold, doublestruck, sans, monospace, keycap (alias emoji), braille
+ *   fullwidth, bold, doublestruck, sans, monospace, keycap (alias emoji), clock, braille
  * @returns {string|false} Styled digits or false if invalid
  *
  * @example

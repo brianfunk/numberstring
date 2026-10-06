@@ -65,7 +65,7 @@ export interface CompactOptions {
 /** Unicode digit styles accepted by fancy() */
 export type FancyStyle =
   | 'circled' | 'superscript' | 'subscript' | 'fullwidth' | 'bold'
-  | 'doublestruck' | 'sans' | 'monospace' | 'keycap' | 'emoji' | 'braille';
+  | 'doublestruck' | 'sans' | 'monospace' | 'keycap' | 'emoji' | 'clock' | 'braille';
 
 export interface ScientificOptions extends Pick<Options, 'cap'> {
   /** Maximum significant digits, rounds half up (default 12) */

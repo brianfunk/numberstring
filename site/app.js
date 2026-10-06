@@ -1,7 +1,7 @@
 import numberstring, {
   comma, ordinal, roman, year, currency, telephone, fraction,
   nth, compact, fancy, egyptian, babylonian, greek, chinese, japanese, nato, morse,
-  scientific, binary, octal, hex, bytes, bits, clock
+  scientific, binary, octal, hex, bytes, bits
 } from './lib/index.js';
 
 const LANGS = [
@@ -124,7 +124,7 @@ const render = (raw) => {
   row('fullwidth', fancy(parsed.str, 'fullwidth'));
   row('doublestruck', fancy(parsed.str, 'doublestruck'));
   row('emoji', fancy(parsed.str, 'emoji'));
-  row('clock', smallInt && value >= 0 && value <= 24 ? clock(value) : false, 'glyphs');
+  row('clocks', fancy(parsed.str, 'clock'), 'glyphs');
   row('braille', fancy(parsed.str, 'braille'));
   row('egyptian', wholeInt ? egyptian(value) : false, 'glyphs');
   row('babylonian', wholeInt ? babylonian(value) : false, 'glyphs');

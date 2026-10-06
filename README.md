@@ -210,7 +210,7 @@ compact(1500000, { long: true });  // '1.5 million'
 
 #### `fancy(n, [style])`
 
-Digits in a Unicode style: `circled` (default), `superscript`, `subscript`, `fullwidth`, `bold`, `doublestruck`, `sans`, `monospace`, `keycap` (alias `emoji`), `braille`.
+Digits in a Unicode style: `circled` (default), `superscript`, `subscript`, `fullwidth`, `bold`, `doublestruck`, `sans`, `monospace`, `keycap` (alias `emoji`), `clock`, `braille`.
 
 ```javascript
 import { fancy } from 'numberstring';
@@ -219,6 +219,7 @@ fancy(42);                   // '④②'
 fancy(42, 'superscript');    // '⁴²'
 fancy(42, 'doublestruck');   // '𝟜𝟚'
 fancy(42, 'keycap');         // '4️⃣2️⃣'
+fancy(814, 'clock');         // '🕗🕐🕓'
 fancy(-3.5, 'braille');      // '⠼⠤⠉⠨⠑'
 ```
 

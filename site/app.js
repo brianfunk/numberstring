@@ -104,7 +104,6 @@ const render = (raw) => {
   row('octal', !isDecimal ? octal(value, { prefix: true }) : false, 'roman');
   row('hex', !isDecimal ? hex(value, { prefix: true }) : false, 'roman');
   row('bytes', wholeInt ? bytes(value) : false);
-  row('bytes (binary)', wholeInt ? bytes(value, { binary: true }) : false);
   row('bits', wholeInt ? bits(value) : false);
   row('morse', morse(parsed.str), 'roman');
   row('fraction', smallInt && value >= 2 ? fraction(1, value) : false);

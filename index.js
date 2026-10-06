@@ -651,7 +651,9 @@ const compact = (n, opt) => {
   if (intPart.length < 4) {
     const small = Number(`${intPart}.${fracPart || '0'}`);
     const rounded = Number(small.toFixed(digits));
-    return `${negative ? '-' : ''}${rounded}`;
+    // 999.99 rounds up to 1000, which belongs in the next scale
+    if (rounded < 1000) return `${negative ? '-' : ''}${rounded}`;
+    return `${negative ? '-' : ''}1${opt?.long ? ` ${ILLIONS[1]}` : COMPACT_SUFFIXES[1]}`;
   }
 
   let g = Math.floor((intPart.length - 1) / 3);

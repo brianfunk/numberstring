@@ -101,6 +101,11 @@ describe('compact', () => {
   it('carries when rounding crosses a scale', () => {
     expect(compact(999950)).toBe('1M');
     expect(compact(999999)).toBe('1M');
+    expect(compact(999.99)).toBe('1K');
+    expect(compact(999.999, { digits: 2 })).toBe('1K');
+    expect(compact(-999.99)).toBe('-1K');
+    expect(compact(999.99, { long: true })).toBe('1 thousand');
+    expect(compact(999.4)).toBe('999.4');
   });
 
   it('handles negatives, strings, and decimals', () => {

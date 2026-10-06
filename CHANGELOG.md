@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fancy()` accepts `emoji` as an alias for `keycap`, and a `clock` style that turns each digit into a clock face (814 → 🕗🕐🕓).
 - `roman()` now supports vinculum notation above 3999 (a bar multiplies by 1000, two bars by a million), up to 3,999,999,999.
 - Open Graph and Twitter card tags on the playground, with a PNG preview image (`site/og.png`, rendered from `site/og.svg`).
+- `comma()` keeps decimals (`1,234,567.89`) and accepts numeric strings.
+- Fuzz test (`test/fuzz.test.js`) proves every public function returns a value, never throws, for hostile inputs and options.
 - `year()` accepts years beyond 9999 (read as cardinals) and BigInt.
 - `bahasa` accepted as an alias for Indonesian.
 

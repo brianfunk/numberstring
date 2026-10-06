@@ -97,7 +97,11 @@ const MAX_VALUE = 10n ** 36n - 1n;
 // HELPER FUNCTIONS
 // ============================================================================
 
-const group = (n) => Math.ceil(n.toString().length / 3) - 1;
+const group = (n) => {
+  if (typeof n !== 'number' && typeof n !== 'bigint') return false;
+  if (typeof n === 'number' && !Number.isFinite(n)) return false;
+  return Math.ceil((n < 0 ? -n : n).toString().length / 3) - 1;
+};
 const power = (g) => 10n ** BigInt(g * 3);
 const segment = (n, g) => n % power(g + 1);
 const hundment = (n, g) => Number(segment(n, g) / power(g));
@@ -169,8 +173,18 @@ const comma = (n) => {
   if (typeof n === 'bigint') {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
-  if (isNaN(n)) return false;
-  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (typeof n === 'number') {
+    if (!Number.isFinite(n)) return false;
+    const [intPart, fracPart] = n.toString().split('.');
+    const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return fracPart === undefined ? grouped : `${grouped}.${fracPart}`;
+  }
+  if (typeof n === 'string' && /^-?\d+(\.\d+)?$/.test(n.trim())) {
+    const [intPart, fracPart] = n.trim().split('.');
+    const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return fracPart === undefined ? grouped : `${grouped}.${fracPart}`;
+  }
+  return false;
 };
 
 // ============================================================================
@@ -256,7 +270,7 @@ const string = (n, opt) => {
   let value = n;
   // Delegates apply `cap` themselves; `punc` is applied once in finish()
   const inner = opt ? { ...opt, punc: undefined } : opt;
-  const lang = opt?.lang?.toLowerCase();
+  const lang = typeof opt?.lang === 'string' ? opt.lang.toLowerCase() : undefined;
   const foreign = Boolean(lang && LANGUAGES[lang] && LANGUAGES[lang] !== 'english');
 
   if (typeof value === 'string') {
@@ -1165,7 +1179,7 @@ const percent = (pct, opt) => {
  * @returns {string|false} The word representation
  */
 const toWords = (n, opt) => {
-  const lang = opt?.lang?.toLowerCase() || 'en';
+  const lang = typeof opt?.lang === 'string' ? opt.lang.toLowerCase() : 'en';
   const langKey = LANGUAGES[lang] || 'english';
 
   let result;

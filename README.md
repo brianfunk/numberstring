@@ -25,7 +25,7 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Ancient and alternative numerals** - Egyptian hieroglyphs, Babylonian cuneiform, Greek letters, Chinese/Japanese financial forms
 - **Unicode digit styles** - ④② ⁴² ４２ 𝟜𝟚 4️⃣2️⃣ ⠼⠙⠃
 - **Forgiving input** - Integers, negatives, decimals, numeric strings, BigInt. It just works
-- **Well tested** - 730+ tests with 90%+ coverage, including per-language spot checks
+- **Well tested** - 780+ tests with 90%+ coverage, per-language spot checks, and a fuzz suite proving nothing ever throws
 - **Modern ES modules** - Tree-shakeable, with bundled TypeScript declarations
 
 ## Installation
@@ -392,7 +392,8 @@ Format a number with comma separators.
 ```javascript
 import { comma } from 'numberstring';
 
-comma(1234567);  // '1,234,567'
+comma(1234567);     // '1,234,567'
+comma(1234567.89);  // '1,234,567.89'
 ```
 
 ## Multi-Language Support

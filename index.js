@@ -369,7 +369,7 @@ const decimal = (n, opt) => {
 
   const intDigits = intPart || '0';
   const intNum = intDigits.length <= 15 ? parseInt(intDigits, 10) : BigInt(intDigits);
-  const intWords = cardinal(intNum);
+  const intWords = cardinal(intNum, { and: opt?.and });
   if (intWords === false) return false;
 
   let result = isNegative ? 'negative ' : '';
@@ -643,7 +643,9 @@ const compact = (n, opt) => {
 
   const negative = str.startsWith('-');
   if (negative) str = str.slice(1);
-  const [intPart, fracPart = ''] = str.split('.');
+  const [rawInt, fracPart = ''] = str.split('.');
+  // Leading zeros carry no magnitude: '0001000' is 1000
+  const intPart = rawInt.replace(/^0+(?=\d)/, '');
   const digits = Math.max(0, Math.min(opt?.digits ?? 1, 6));
 
   if (intPart.length < 4) {
@@ -657,9 +659,9 @@ const compact = (n, opt) => {
   // Value / 10^(3g) as a float; precision loss is irrelevant at <= 6 decimals
   const scaled = Number(`${intPart.slice(0, intPart.length - 3 * g)}.${intPart.slice(intPart.length - 3 * g)}${fracPart}`);
   let value = Number(scaled.toFixed(digits));
-  if (value >= 1000) {
+  // Rounding can carry into the next scale; at the last scale keep 1000Dc
+  if (value >= 1000 && g + 1 < COMPACT_SUFFIXES.length) {
     g++;
-    if (g >= COMPACT_SUFFIXES.length) return false;
     value = Number((value / 1000).toFixed(digits));
   }
 

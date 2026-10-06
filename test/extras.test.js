@@ -29,6 +29,11 @@ describe('and option (British style)', () => {
     expect(numberstring(1001)).toBe('one thousand one');
   });
 
+  it('applies to the integer part of decimals', () => {
+    expect(numberstring('123.4', { and: true })).toBe('one hundred and twenty-three point four');
+    expect(numberstring(1001.5, { and: true })).toBe('one thousand and one point five');
+  });
+
   it('flows through negatives and ordinals', () => {
     expect(numberstring(-1001, { and: true })).toBe('negative one thousand and one');
     expect(ordinal(101, { and: true })).toBe('one hundred and first');
@@ -108,6 +113,17 @@ describe('compact', () => {
     expect(compact(1234567, { digits: 0 })).toBe('1M');
     expect(compact(1500000, { long: true })).toBe('1.5 million');
     expect(compact(2000, { long: true })).toBe('2 thousand');
+  });
+
+  it('ignores leading zeros when picking a scale', () => {
+    expect(compact('0001')).toBe('1');
+    expect(compact('0001000')).toBe('1K');
+    expect(compact('00')).toBe('0');
+  });
+
+  it('keeps the top scale instead of failing at the upper bound', () => {
+    expect(compact(10n ** 36n - 1n)).toBe('1000Dc');
+    expect(compact(10n ** 36n - 1n, { long: true })).toBe('1000 decillion');
   });
 
   it('rejects invalid input', () => {
@@ -269,6 +285,9 @@ describe('formal Chinese and Japanese numerals', () => {
     expect(chinese(1001, { formal: true })).toBe('壹仟零壹');
     expect(chinese(123456, { formal: true })).toBe('壹拾贰万叁仟肆佰伍拾陆');
     expect(chinese(100000001, { formal: true })).toBe('壹亿零壹');
+    expect(chinese(10001, { formal: true })).toBe('壹万零壹');
+    expect(chinese(10010, { formal: true })).toBe('壹万零壹拾');
+    expect(chinese(10100, { formal: true })).toBe('壹万零壹佰');
     expect(chinese(0, { formal: true })).toBe('零');
   });
 

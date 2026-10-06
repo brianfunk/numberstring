@@ -797,6 +797,10 @@ describe('chinese', () => {
   it('handles zeros in the middle', () => {
     expect(chinese(101)).toBe('一百零一');
     expect(chinese(1001)).toBe('一千零一');
+    expect(chinese(10001)).toBe('一万零一');
+    expect(chinese(10010)).toBe('一万零一十');
+    expect(chinese(100000001)).toBe('一亿零一');
+    expect(chinese(100010000)).toBe('一亿零一万');
   });
 
   it('converts thousands and wan', () => {

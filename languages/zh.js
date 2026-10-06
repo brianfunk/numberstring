@@ -87,7 +87,7 @@ const chinese = (n, opt) => {
     }
 
     if (hundreds > 0) {
-      if (innerZero && grpStr) grpStr += '零';
+      if (innerZero && (grpStr || (result && !result.endsWith('零')))) grpStr += '零';
       grpStr += digitWords[hundreds] + unitWords[2];
       innerZero = false;
     } else if (thousands > 0) {
@@ -95,7 +95,7 @@ const chinese = (n, opt) => {
     }
 
     if (tens > 0) {
-      if (innerZero && grpStr) grpStr += '零';
+      if (innerZero && (grpStr || (result && !result.endsWith('零')))) grpStr += '零';
       // Special: 10-19 at start is just 十X, not 一十X
       if (tens === 1 && !formal && !result && thousands === 0 && hundreds === 0) {
         grpStr += unitWords[1];
@@ -108,7 +108,7 @@ const chinese = (n, opt) => {
     }
 
     if (ones > 0) {
-      if (innerZero && grpStr) grpStr += '零';
+      if (innerZero && (grpStr || (result && !result.endsWith('零')))) grpStr += '零';
       grpStr += digitWords[ones];
     }
 

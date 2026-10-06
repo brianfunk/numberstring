@@ -594,8 +594,30 @@ describe('roman', () => {
       expect(roman(-1)).toBe(false);
     });
 
-    it('returns false for numbers over 3999', () => {
-      expect(roman(4000)).toBe(false);
+    it('uses vinculum notation above 3999', () => {
+      const bar = '\u0305';
+      const dbl = '\u033F';
+      expect(roman(4000)).toBe(`I${bar}V${bar}`);
+      expect(roman(4001)).toBe(`I${bar}V${bar}I`);
+      expect(roman(1000000)).toBe(`M${bar}`);
+      expect(roman(3999999)).toBe(`M${bar}M${bar}M${bar}C${bar}M${bar}X${bar}C${bar}I${bar}X${bar}CMXCIX`);
+      expect(roman(4000000)).toBe(`I${dbl}V${dbl}`);
+      expect(roman(8675309)).toBe(`V${dbl}I${dbl}I${dbl}I${dbl}D${bar}C${bar}L${bar}X${bar}X${bar}V${bar}CCCIX`);
+      expect(roman(1000000000)).toBe(`M${dbl}`);
+      expect(roman(3999999999)).toMatch(/^M\u033FM\u033FM\u033F/);
+    });
+
+    it('skips empty middle groups', () => {
+      expect(roman(1000001)).toBe('M\u0305I');
+      expect(roman(2000000000)).toBe('M\u033FM\u033F');
+    });
+
+    it('lowercases barred numerals', () => {
+      expect(roman(4000, { lower: true })).toBe('i\u0305v\u0305');
+    });
+
+    it('returns false above 3,999,999,999', () => {
+      expect(roman(4000000000)).toBe(false);
     });
 
     it('returns false for non-integers', () => {
@@ -775,6 +797,10 @@ describe('chinese', () => {
   it('handles zeros in the middle', () => {
     expect(chinese(101)).toBe('一百零一');
     expect(chinese(1001)).toBe('一千零一');
+    expect(chinese(10001)).toBe('一万零一');
+    expect(chinese(10010)).toBe('一万零一十');
+    expect(chinese(100000001)).toBe('一亿零一');
+    expect(chinese(100010000)).toBe('一亿零一万');
   });
 
   it('converts thousands and wan', () => {
@@ -976,7 +1002,7 @@ describe('year', () => {
 
   it('returns false for invalid years', () => {
     expect(year(-1)).toBe(false);
-    expect(year(10000)).toBe(false);
+    expect(year(10000)).toBe('ten thousand');
     expect(year(3.14)).toBe(false);
   });
 });

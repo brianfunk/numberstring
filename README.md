@@ -11,7 +11,7 @@
 
 > Number One Way to Makes Words from Numbers
 
-Transform any number into beautiful words. From `42` to `"forty-two"`, from `1000000` to `"one million"`. Supports **22 languages**, ordinals, currency, Roman numerals, and more!
+Transform any number into beautiful words. From `42` to `"forty-two"`, from `1000000` to `"one million"`. Supports **22 languages**, ordinals, currency, Roman numerals, Egyptian hieroglyphs, Babylonian cuneiform, circled digits, and more!
 
 **Try it:** [numberstring.netlify.app](https://numberstring.netlify.app) — type a number, see it in 22 languages. Runs entirely in your browser.
 
@@ -20,10 +20,12 @@ Transform any number into beautiful words. From `42` to `"forty-two"`, from `100
 - **Zero dependencies** - Lightweight and fast
 - **22 languages** - English, Spanish, French, German, Danish, Chinese, Hindi, Russian, Portuguese, Japanese, Korean, Arabic, Italian, Dutch, Turkish, Polish, Swedish, Indonesian, Thai, Norwegian, Finnish, Icelandic
 - **Huge range** - Supports 0 to decillions (10^36) with BigInt
-- **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers
-- **Roman numerals** - Convert to and from Roman numerals
+- **Feature-rich** - Ordinals, decimals, currency, fractions, years, phone numbers, NATO/ICAO radio numerals, Morse code, scientific notation, binary/hex, byte sizes, clock faces
+- **Roman numerals** - Classic and vinculum notation to 3,999,999,999
+- **Ancient and alternative numerals** - Egyptian hieroglyphs, Babylonian cuneiform, Greek letters, Chinese/Japanese financial forms
+- **Unicode digit styles** - ④② ⁴² ４２ 𝟜𝟚 4️⃣2️⃣ ⠼⠙⠃
 - **Forgiving input** - Integers, negatives, decimals, numeric strings, BigInt. It just works
-- **Well tested** - 660+ tests with 90%+ coverage, including per-language spot checks
+- **Well tested** - 780+ tests with 90%+ coverage, per-language spot checks, and a fuzz suite proving nothing ever throws
 - **Modern ES modules** - Tree-shakeable, with bundled TypeScript declarations
 
 ## Installation
@@ -43,10 +45,44 @@ numberstring(10n ** 18n);            // 'one quintillion' (BigInt!)
 numberstring(-3.14);                 // 'negative three point one four'
 numberstring('1000');                // 'one thousand'
 numberstring(42, { lang: 'es' });    // 'cuarenta y dos'
+numberstring(123, { and: true });    // 'one hundred and twenty-three'
 numberstring(123, { cap: 'title' }); // 'One Hundred Twenty-Three'
 ```
 
 ## API Reference
+
+Everything at a glance. Every function returns a `string`, or `false` when the input cannot be converted.
+
+| Function | Example | Result |
+|----------|---------|--------|
+| `numberstring(n, opt)` | `numberstring(-3.14)` | `negative three point one four` |
+| `toWords(n, { lang })` | `toWords(42, { lang: 'es' })` | `cuarenta y dos` |
+| `ordinal(n)` | `ordinal(21)` | `twenty-first` |
+| `nth(n)` | `nth(22)` | `22nd` |
+| `decimal(n)` | `decimal(3.14)` | `three point one four` |
+| `fraction(a, b)` | `fraction(3, 4)` | `three quarters` |
+| `percent(n)` | `percent(50)` | `fifty percent` |
+| `currency(s)` | `currency('$1.50')` | `one dollar and fifty cents` |
+| `year(n)` | `year(1984)` | `nineteen eighty-four` |
+| `telephone(s, { oh })` | `telephone(8675309, { oh: true })` | `eight six seven five three oh nine` |
+| `nato(n)` / `icao` / `military` | `nato(1984)` | `wun niner ait fower` |
+| `morse(n)` | `morse(42)` | `....- ..---` |
+| `compact(n)` | `compact(1500000)` | `1.5M` |
+| `scientific(n)` | `scientific(1984)` | `1.984 × 10³` |
+| `comma(n)` | `comma(1234567)` | `1,234,567` |
+| `binary(n)` / `octal` / `hex` / `radix(n, base)` | `hex(255, { prefix: true })` | `0xff` |
+| `bytes(n)` / `bits(n)` | `bytes(1536)` | `1.5 KB` |
+| `roman(n)` | `roman(1999)` | `MCMXCIX` |
+| `greek(n)` | `greek(42)` | `μβʹ` |
+| `egyptian(n)` | `egyptian(42)` | `𓎆𓎆𓎆𓎆𓏺𓏺` |
+| `babylonian(n)` | `babylonian(42)` | `𒌋𒌋𒌋𒌋𒁹𒁹` |
+| `fancy(n, style)` | `fancy(42, 'doublestruck')` | `𝟜𝟚` |
+| `clock(time)` | `clock('3:30')` | `🕞` |
+| `parse(words)` | `parse('forty-two')` | `42` |
+| `negative(n)` | `negative(-42)` | `negative forty-two` |
+
+Constants: `CAP_STYLES` (casing names for `cap`), `FANCY_STYLE_NAMES` (styles for `fancy`). Each language is also a named export (`spanish`, `french`, ... see below).
+
 
 ### Core Functions
 
@@ -65,7 +101,19 @@ numberstring(100, { punc: '!' });    // 'one hundred!'
 numberstring('abc');                 // false
 ```
 
-Negatives and decimals are English-only; with another `lang` they return `false` rather than falling back to English.
+Every word-producing function takes `cap`, and it does more than capitalize:
+
+```javascript
+numberstring(123, { cap: 'camel' });     // 'oneHundredTwentyThree'
+numberstring(123, { cap: 'pascal' });    // 'OneHundredTwentyThree'
+numberstring(123, { cap: 'snake' });     // 'one_hundred_twenty_three'
+numberstring(123, { cap: 'kebab' });     // 'one-hundred-twenty-three'
+numberstring(123, { cap: 'constant' });  // 'ONE_HUNDRED_TWENTY_THREE'
+numberstring(123, { cap: 'dot' });       // 'one.hundred.twenty.three'
+numberstring(123, { cap: 'sentence' });  // 'One hundred twenty-three'
+```
+
+Negatives and decimals are English-only; with another `lang` they return `false` rather than falling back to English. Pass `and: true` for British style ("one hundred and one", "one thousand and one").
 
 #### `ordinal(n, [options])`
 
@@ -110,7 +158,7 @@ Supported currencies: `$` `€` `£` `¥` `₹` `元` (USD, EUR, GBP, JPY, INR, 
 
 #### `roman(n, [options])`
 
-Convert to Roman numerals.
+Convert to Roman numerals. Above 3999, vinculum notation puts a bar over a group to multiply it by 1000 (two bars for a million), reaching 3,999,999,999.
 
 ```javascript
 import { roman } from 'numberstring';
@@ -118,6 +166,8 @@ import { roman } from 'numberstring';
 roman(42);                   // 'XLII'
 roman(1999);                 // 'MCMXCIX'
 roman(4, { lower: true });   // 'iv'
+roman(4000);                 // 'I̅V̅'
+roman(8675309);              // 'V̿I̿I̿I̿D̅C̅L̅X̅X̅V̅CCCIX'
 ```
 
 #### `parse(str)`
@@ -130,6 +180,70 @@ import { parse } from 'numberstring';
 parse('forty-two');        // 42
 parse('one thousand');     // 1000
 parse('one quintillion');  // 1000000000000000000n (BigInt)
+```
+
+#### `nth(n)`
+
+Numeric ordinal suffix.
+
+```javascript
+import { nth } from 'numberstring';
+
+nth(1);    // '1st'
+nth(22);   // '22nd'
+nth(113);  // '113th'
+```
+
+#### `compact(n, [options])`
+
+Compact notation.
+
+```javascript
+import { compact } from 'numberstring';
+
+compact(1500);                     // '1.5K'
+compact(2300000000);               // '2.3B'
+compact(999950);                   // '1M'
+compact(1234567, { digits: 2 });   // '1.23M'
+compact(1500000, { long: true });  // '1.5 million'
+```
+
+#### `fancy(n, [style])`
+
+Digits in a Unicode style: `circled` (default), `superscript`, `subscript`, `fullwidth`, `bold`, `doublestruck`, `sans`, `monospace`, `keycap` (alias `emoji`), `clock`, `braille`.
+
+```javascript
+import { fancy } from 'numberstring';
+
+fancy(42);                   // '④②'
+fancy(42, 'superscript');    // '⁴²'
+fancy(42, 'doublestruck');   // '𝟜𝟚'
+fancy(42, 'keycap');         // '4️⃣2️⃣'
+fancy(814, 'clock');         // '🕗🕐🕓'
+fancy(-3.5, 'braille');      // '⠼⠤⠉⠨⠑'
+```
+
+### Ancient and Alternative Numerals
+
+All render with Unicode glyphs, so they need a font that covers the block (most modern systems do).
+
+```javascript
+import { egyptian, babylonian, greek } from 'numberstring';
+
+egyptian(42);     // '𓎆𓎆𓎆𓎆𓏺𓏺'       additive, 1 to 9,999,999
+babylonian(42);   // '𒌋𒌋𒌋𒌋𒁹𒁹'       base 60, places separated by spaces
+babylonian(3600); // '𒁹 𒑊 𒑊'
+greek(42);        // 'μβʹ'             Ionic letters, 1 to 9999
+greek(1999);      // '͵αϡϟθʹ'
+```
+
+Chinese and Japanese also have the anti-fraud financial forms used on cheques:
+
+```javascript
+import { chinese, japanese } from 'numberstring';
+
+chinese(1001, { formal: true });   // '壹仟零壹'  (大写)
+japanese(1001, { formal: true });  // '壱千壱'    (大字)
 ```
 
 ### Utility Functions
@@ -164,9 +278,10 @@ Convert years to spoken form.
 ```javascript
 import { year } from 'numberstring';
 
-year(1984);  // 'nineteen eighty-four'
-year(2000);  // 'two thousand'
-year(2024);  // 'twenty twenty-four'
+year(1984);     // 'nineteen eighty-four'
+year(2000);     // 'two thousand'
+year(2024);     // 'twenty twenty-four'
+year(8675309);  // 'eight million six hundred seventy-five thousand three hundred nine'
 ```
 
 #### `telephone(phone, [options])`
@@ -176,8 +291,86 @@ Convert phone numbers to words.
 ```javascript
 import { telephone } from 'numberstring';
 
-telephone('555-1234');  // 'five five five one two three four'
-telephone(8675309);     // 'eight six seven five three zero nine'
+telephone('555-1234');              // 'five five five one two three four'
+telephone(8675309);                 // 'eight six seven five three zero nine'
+telephone(8675309, { oh: true });   // 'eight six seven five three oh nine'
+```
+
+#### `nato(n, [options])`
+
+ICAO / NATO radiotelephony numerals, the way pilots and air traffic control read numbers. Also exported as `icao` and `military`.
+
+```javascript
+import { nato } from 'numberstring';
+
+nato(1984);                   // 'wun niner ait fower'
+nato(2500);                   // 'too tousand fife hundred'
+nato('121.5');                // 'wun too wun decimal fife'
+nato(2500, { digits: true }); // 'too fife zero zero'
+```
+
+#### `morse(n)`
+
+International Morse code for the digits.
+
+```javascript
+import { morse } from 'numberstring';
+
+morse(42);   // '....- ..---'
+morse(3.1);  // '...-- .-.-.- .----'
+```
+
+#### `scientific(n, [options])`
+
+Scientific notation with an exact decimal mantissa. Formats: `unicode` (default), `caret`, `e`, `words`.
+
+```javascript
+import { scientific } from 'numberstring';
+
+scientific(1984);                        // '1.984 × 10³'
+scientific(0.00042);                     // '4.2 × 10⁻⁴'
+scientific(1984, { format: 'e' });       // '1.984e3'
+scientific(1984, { digits: 3 });         // '1.98 × 10³'
+scientific(1984, { format: 'words' });   // 'one point nine eight four times ten to the third'
+```
+
+#### `binary(n)`, `octal(n)`, `hex(n)`, `radix(n, base)`
+
+Integers in other bases, 2 to 36.
+
+```javascript
+import { binary, hex, radix } from 'numberstring';
+
+binary(42);                                      // '101010'
+hex(255, { prefix: true, upper: true });         // '0xFF'
+binary(5, { pad: 8 });                           // '00000101'
+radix(42, 36);                                   // '16'
+```
+
+#### `bytes(n, [options])` and `bits(n, [options])`
+
+Human-readable data sizes. Bytes use `KB`/`KiB`, bits use bandwidth-style `kb`/`Mb`.
+
+```javascript
+import { bytes, bits } from 'numberstring';
+
+bytes(1536);                     // '1.5 KB'
+bytes(1536, { binary: true });   // '1.5 KiB'
+bytes(1536, { long: true });     // 'one point five kilobytes'
+bits(1500000);                   // '1.5 Mb'
+bits(1500000, { long: true });   // 'one point five megabits'
+```
+
+#### `clock(time)`
+
+Clock-face emoji for an hour or an `H:MM` time, rounded to the half hour.
+
+```javascript
+import { clock } from 'numberstring';
+
+clock(3);        // '🕒'
+clock('3:30');   // '🕞'
+clock(15);       // '🕒'
 ```
 
 #### `percent(pct, [options])`
@@ -199,7 +392,8 @@ Format a number with comma separators.
 ```javascript
 import { comma } from 'numberstring';
 
-comma(1234567);  // '1,234,567'
+comma(1234567);     // '1,234,567'
+comma(1234567.89);  // '1,234,567.89'
 ```
 
 ## Multi-Language Support
@@ -260,23 +454,37 @@ toWords(42, { lang: 'is' });  // 'fjörutíu og tveir'
 | `fi` | Finnish | neljäkymmentäkaksi |
 | `is` | Icelandic | fjörutíu og tveir |
 
+### Direct language exports
+
+Each language is also exported by name for tree-shaking: `spanish`, `french`, `german`, `danish`, `chinese`, `hindi`, `russian`, `portuguese`, `japanese`, `korean`, `arabic`, `italian`, `dutch`, `turkish`, `polish`, `swedish`, `indonesian`, `thai`, `norwegian`, `finnish`, `icelandic`. They take a non-negative integer and return the cardinal words. Use `toWords()` or `numberstring()` with `lang` when you want `cap` and the other options.
+
+```javascript
+import { french, japanese } from 'numberstring';
+
+french(1984);                        // 'mille neuf cent quatre-vingt-quatre'
+japanese(1984, { formal: true });    // '壱千九百八拾四'
+```
+
 ### Adding a New Language
 
 Languages are modular! To add a new language:
 
 1. Create `languages/xx.js` following the pattern in `languages/en.js`
 2. Export your conversion function
-3. Add to `languages/index.js`
-4. Submit a PR!
+3. Add to `languages/index.js`, re-export it from `index.js`, and add it to the `toWords` switch
+4. Add a row to the table in `test/languages.test.js` and a named export in `index.d.ts`
+5. Submit a PR!
 
 ## Options
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `cap` | `string` | Capitalization: `'title'`, `'upper'`, or `'lower'` |
+| `cap` | `string` | Casing: `'title'`, `'upper'`, `'lower'`, `'sentence'`, `'camel'`, `'pascal'`, `'snake'`, `'kebab'`, `'constant'`, `'dot'` |
 | `punc` | `string` | Punctuation: `'!'`, `'?'`, or `'.'` |
 | `lang` | `string` | Language code for `numberstring()` and `toWords()` |
 | `point` | `string` | Word for decimal point (default: `'point'`) |
+| `and` | `boolean` | British style: `one hundred and one` |
+| `formal` | `boolean` | Chinese/Japanese financial numerals |
 | `lower` | `boolean` | Lowercase Roman numerals |
 
 ## Supported Scales

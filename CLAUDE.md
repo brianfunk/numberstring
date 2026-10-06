@@ -48,9 +48,10 @@ Key constants:
 ## Layout
 
 - `index.js` - core English conversion plus all public helpers; `numberstring()` is forgiving and delegates to `negative()`, `decimal()`, `toWords()`
+- `numerals.js` - alternative numeral systems (egyptian, babylonian, greek) and `fancy()` Unicode digit styles; table-driven, re-exported from index.js. Only add Unicode blocks that macOS renders out of the box (Mayan numerals and tally marks did not)
 - `languages/` - one module per language, cardinals only, non-negative integers only
 - `test/languages.test.js` - per-language spot-check table; update expectations when fixing a language
-- `site/` - static playground deployed to Netlify (`netlify.toml`); `scripts/build-site.js` copies the library into `site/lib/`
+- `site/` - static playground deployed to Netlify (`netlify.toml`); `scripts/build-site.js` copies the library into `site/lib/`. `og.png` is the social preview; after editing `og.svg` run `npm run site:og` to re-render it
 - `archive/server/` - old Express API, unmaintained, excluded from tests and lint; do not extend it
 
 ## Supported Languages
@@ -68,15 +69,16 @@ Key constants:
 
 ## Features
 
-- Number to words (cardinal)
-- Ordinals (1st, 2nd, 3rd)
-- Decimals (3.14 → "three point one four")
-- Currency ($1.23 → "one dollar and twenty-three cents")
-- Fractions (1/2 → "one half")
-- Roman numerals (42 → "XLII")
-- Negative numbers
-- BigInt support up to 10^36
-- Forgiving input: `numberstring(-3.14)`, `numberstring('42')`, `numberstring(42, { lang: 'de' })` all work; invalid input returns `false`
+Everything is exported from `index.js`; every function returns `string | false`.
+
+- English words: `numberstring` (cardinal, forgiving input), `ordinal`, `nth`, `decimal`, `fraction`, `percent`, `currency`, `year`, `telephone` (`oh` option), `negative`, `parse` (words → number)
+- 22 languages via `toWords(n, { lang })` or the named exports; `chinese`/`japanese` take `formal` for 大写/大字
+- Spoken and coded: `nato` (`icao`, `military`), `morse`
+- Notation: `compact` (1.5K), `scientific` (1.984 × 10³), `comma`, `binary`/`octal`/`hex`/`radix`, `bytes`/`bits`
+- Other numeral systems: `roman` (vinculum above 3999), `greek`, `egyptian`, `babylonian`, `fancy` (circled, superscript, doublestruck, keycap/emoji, braille, ...), `clock`
+- Options: `cap` casing styles (title, upper, lower, sentence, camel, pascal, snake, kebab, constant, dot), `punc`, `and` (British), `lang`, `point`, `formal`
+- BigInt support up to 10^36; invalid input returns `false`
+- **Zero runtime dependencies, always.** Never add a package to `dependencies`.
 
 ---
 

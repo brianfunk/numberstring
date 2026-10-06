@@ -9,13 +9,21 @@
 ### Main Export: `numberstring(n, options)`
 - Converts a number to words; forgiving: accepts integers, negatives, decimals, numeric strings, BigInt
 - Returns `string` on success, `false` on invalid input
-- Options: `{ cap: 'title'|'upper'|'lower', punc: '!'|'?'|'.', lang: 'es'|'fr'|..., point: 'point' }`
+- Options: `cap` (title, upper, lower, sentence, camel, pascal, snake, kebab, constant, dot), `punc` ('!' '?' '.'), `lang`, `point`, `and` (British), `formal` (zh/ja)
 
 ### Named Exports
-- `ordinal`, `decimal`, `currency`, `roman`, `parse`, `negative`, `fraction`, `year`, `telephone`, `percent`, `toWords`
-- `comma(n)` - Format number with comma separators
-- `group(n)` - Get magnitude group (0=ones, 1=thousands, 2=millions, etc.)
-- One named export per language (`spanish`, `french`, ...)
+
+English words: `ordinal`, `nth`, `decimal`, `fraction`, `percent`, `currency`, `year`, `telephone`, `negative`, `parse`, `toWords`
+
+Spoken and coded: `nato` (aliases `icao`, `military`), `morse`
+
+Notation: `compact`, `scientific`, `comma`, `group`, `binary`, `octal`, `hex`, `radix`, `bytes`, `bits`
+
+Other numeral systems (`numerals.js`): `roman`, `greek`, `egyptian`, `babylonian`, `fancy`, `clock`
+
+Languages (cardinals, non-negative integers): `spanish`, `french`, `german`, `danish`, `chinese`, `hindi`, `russian`, `portuguese`, `japanese`, `korean`, `arabic`, `italian`, `dutch`, `turkish`, `polish`, `swedish`, `indonesian`, `thai`, `norwegian`, `finnish`, `icelandic`. `chinese` and `japanese` accept `{ formal: true }`; `spanish` and `portuguese` accept `{ cap }`.
+
+Constants: `CAP_STYLES`, `FANCY_STYLE_NAMES`
 
 ## Usage Examples
 
@@ -50,10 +58,15 @@ npm run test:coverage  # Run with coverage
 
 ## Code Architecture
 
-- `index.js` - English core and all public helpers
+- `index.js` - English core and all public helpers (ordinal, nato, scientific, bytes, ...)
+- `numerals.js` - roman-adjacent systems (egyptian, babylonian, greek), `fancy()` digit styles, `clock()`
 - `languages/*.js` - one module per language; `test/languages.test.js` is the per-language spot-check table
+- `test/extras.test.js` - tests for everything added in 1.2.0
+- `index.d.ts` - hand-written types; check with `npx tsc --noEmit --strict index.d.ts`
 - `site/` - playground; `scripts/build-site.js` stages the library into `site/lib/`
 - `archive/` - unmaintained code (old Express server), excluded from tests and lint
 - Pure functions, no side effects
+- **Zero runtime dependencies.** Never add a package to `dependencies`.
+- Only use Unicode blocks that macOS renders with system fonts (Mayan numerals and tally marks were dropped for this reason)
 - Frozen arrays for immutable word lists
 - Full JSDoc type documentation

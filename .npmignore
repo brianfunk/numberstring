@@ -42,3 +42,6 @@ Thumbs.db
 
 # Dependencies
 node_modules/
+
+# Netlify local link state
+.netlify/

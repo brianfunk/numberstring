@@ -742,7 +742,7 @@ const nato = (n, opt) => {
 
   // Round hundreds / thousands: "fife hundred", "wun tousand", "too fife tousand"
   const roundMatch = !opt?.digits && !fracPart && intPart.match(/^(\d{1,2})(\d?)(00)$/);
-  if (roundMatch && /[1-9]/.test(intPart) && intPart.length >= 3 && intPart.length <= 5) {
+  if (roundMatch && !intPart.startsWith('0') && intPart.length >= 3 && intPart.length <= 5) {
     const thousands = intPart.slice(0, -3);
     const hundredsDigit = intPart.slice(-3, -2);
     if (thousands) words.push(...spell(thousands), 'tousand');
@@ -935,7 +935,8 @@ const dataSize = (n, opt, table) => {
     scale *= step;
     unit++;
   }
-  let amount = unit === 0 ? Number(value) : Number((value * 10n ** 6n) / scale) / 1e6;
+  // Keep two guard digits beyond the 6-decimal maximum so toFixed() rounds correctly
+  let amount = unit === 0 ? Number(value) : Number((value * 10n ** 8n) / scale) / 1e8;
   amount = Number(amount.toFixed(digits));
   if (amount >= Number(step) && unit < units.length - 1) {
     unit++;

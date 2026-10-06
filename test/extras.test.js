@@ -291,6 +291,8 @@ describe('nato', () => {
     expect(nato('007')).toBe('zero zero seven');
     expect(nato('000')).toBe('zero zero zero');
     expect(nato('0000')).toBe('zero zero zero zero');
+    expect(nato('00100')).toBe('zero zero wun zero zero');
+    expect(nato('01200')).toBe('zero wun too zero zero');
     expect(nato(10000)).toBe('wun zero tousand');
   });
 
@@ -452,6 +454,8 @@ describe('bytes', () => {
 
   it('honors digits and rejects invalid input', () => {
     expect(bytes(1536, { digits: 0 })).toBe('2 KB');
+    expect(bytes(1234567890, { digits: 6 })).toBe('1.234568 GB');
+    expect(bytes(1234567890, { digits: 3 })).toBe('1.235 GB');
     expect(bytes(-1)).toBe(false);
     expect(bytes(1.5)).toBe(false);
     expect(bytes('abc')).toBe(false);

@@ -118,7 +118,7 @@ const ten = (n) => {
 };
 
 /** Casing styles accepted by the `cap` option */
-const CAP_STYLES = Object.freeze(['title', 'upper', 'lower', 'sentence', 'camel', 'pascal', 'snake', 'kebab', 'constant', 'dot']);
+const CAP_STYLES = Object.freeze(['title', 'upper', 'lower', 'sentence', 'camel', 'pascal', 'snake', 'kebab', 'hyphen', 'constant', 'screaming', 'dot']);
 
 const capFirst = (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
 
@@ -915,7 +915,7 @@ const BIT_UNITS = Object.freeze({
   binaryWords: ['bit', 'kibibit', 'mebibit', 'gibibit', 'tebibit', 'pebibit', 'exbibit', 'zebibit', 'yobibit']
 });
 
-/** Shared engine for bytes() and bits() */
+/** Shared engine for bytes() and bits(): all rounding in BigInt, so precision holds at any size */
 const dataSize = (n, opt, table) => {
   let value;
   if (typeof n === 'bigint') value = n;
@@ -928,6 +928,7 @@ const dataSize = (n, opt, table) => {
   const units = opt?.binary ? table.binary : table.decimal;
   const words = opt?.binary ? table.binaryWords : table.decimalWords;
   const digits = Math.max(0, Math.min(opt?.digits ?? 1, 6));
+  const precision = 10n ** BigInt(digits);
 
   let unit = 0;
   let scale = 1n;
@@ -935,20 +936,25 @@ const dataSize = (n, opt, table) => {
     scale *= step;
     unit++;
   }
-  // Keep two guard digits beyond the 6-decimal maximum so toFixed() rounds correctly
-  let amount = unit === 0 ? Number(value) : Number((value * 10n ** 8n) / scale) / 1e8;
-  amount = Number(amount.toFixed(digits));
-  if (amount >= Number(step) && unit < units.length - 1) {
+  // amount in units of 10^-digits, rounded half up
+  let fixed = (value * precision * 2n + scale) / (scale * 2n);
+  if (fixed >= step * precision && unit < units.length - 1) {
     unit++;
-    amount = Number((amount / Number(step)).toFixed(digits));
+    scale *= step;
+    fixed = (value * precision * 2n + scale) / (scale * 2n);
   }
 
+  const whole = (fixed / precision).toString();
+  const frac = digits ? (fixed % precision).toString().padStart(digits, '0').replace(/0+$/, '') : '';
+  const amountStr = frac ? `${whole}.${frac}` : whole;
+
   if (opt?.long) {
-    const amountWords = Number.isInteger(amount) ? cardinal(amount) : decimal(amount);
-    const noun = amount === 1 ? words[unit] : `${words[unit]}s`;
+    const amountWords = frac ? decimal(amountStr) : cardinal(BigInt(whole));
+    if (amountWords === false) return false;
+    const noun = amountStr === '1' ? words[unit] : `${words[unit]}s`;
     return `${amountWords} ${noun}`;
   }
-  return `${amount} ${units[unit]}`;
+  return `${amountStr} ${units[unit]}`;
 };
 
 /**
@@ -1015,23 +1021,20 @@ const morse = (n) => {
 
 
 const negative = (n, opt) => {
-  if (typeof n === 'bigint') {
-    if (n >= 0n) return cardinal(n, opt);
-    const result = cardinal(-n, opt);
-    if (result === false) return false;
-    let s = `negative ${result}`;
-    if (opt?.cap) s = cap(s, opt.cap);
-    return s;
-  }
+  let value;
+  if (typeof n === 'bigint') value = n;
+  else if (typeof n === 'number' && !isNaN(n)) value = n;
+  else return false;
 
-  if (typeof n !== 'number' || isNaN(n)) return false;
+  if (value >= 0) return cardinal(value, opt);
 
-  if (n >= 0) return cardinal(n, opt);
-
-  const result = cardinal(Math.abs(n), opt);
+  // Case the whole phrase once; casing the inner words first would break camel/pascal
+  const inner = opt ? { ...opt, cap: undefined, punc: undefined } : opt;
+  const result = cardinal(typeof value === 'bigint' ? -value : Math.abs(value), inner);
   if (result === false) return false;
   let s = `negative ${result}`;
   if (opt?.cap) s = cap(s, opt.cap);
+  if (opt?.punc !== undefined) s = punc(s, opt.punc);
   return s;
 };
 

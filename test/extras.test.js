@@ -456,6 +456,10 @@ describe('bytes', () => {
     expect(bytes(1536, { digits: 0 })).toBe('2 KB');
     expect(bytes(1234567890, { digits: 6 })).toBe('1.234568 GB');
     expect(bytes(1234567890, { digits: 3 })).toBe('1.235 GB');
+    expect(bytes(100000000000123456000000000000000000n, { digits: 6 })).toBe('100000000000.123456 YB');
+    expect(bytes(10n ** 30n)).toBe('1000000 YB');
+    expect(bytes(1999, { digits: 0 })).toBe('2 KB');
+    expect(bytes(999999999, { digits: 2 })).toBe('1 GB');
     expect(bytes(-1)).toBe(false);
     expect(bytes(1.5)).toBe(false);
     expect(bytes('abc')).toBe(false);
@@ -532,6 +536,9 @@ describe('cap casing styles', () => {
 
   it('works through delegated paths and other helpers', () => {
     expect(numberstring(-3.5, { cap: 'snake' })).toBe('negative_three_point_five');
+    expect(numberstring(-123, { cap: 'camel' })).toBe('negativeOneHundredTwentyThree');
+    expect(numberstring(-123, { cap: 'pascal' })).toBe('NegativeOneHundredTwentyThree');
+    expect(numberstring(-5n, { cap: 'title', punc: '!' })).toBe('Negative Five!');
     expect(numberstring('42', { cap: 'camel', punc: '!' })).toBe('fortyTwo!');
     expect(numberstring(42, { lang: 'es', cap: 'kebab' })).toBe('cuarenta-y-dos');
     expect(numberstring(1001, { and: true, cap: 'constant' })).toBe('ONE_THOUSAND_AND_ONE');
@@ -545,6 +552,8 @@ describe('cap casing styles', () => {
     expect(numberstring(42, { cap: 'wingdings' })).toBe('forty-two');
     expect(CAP_STYLES).toContain('camel');
     expect(CAP_STYLES).toContain('snake');
+    expect(CAP_STYLES).toContain('hyphen');
+    expect(CAP_STYLES).toContain('screaming');
     expect(roman(4, { lower: true })).toBe('iv');
   });
 });

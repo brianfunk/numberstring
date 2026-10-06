@@ -50,6 +50,10 @@ header { text-align: center; margin-bottom: 24px; }
   margin: 0 auto 8px;
   overflow: hidden;
   white-space: pre;
+  /* header is centered; a pre would center each line separately and skew the art */
+  text-align: left;
+  width: max-content;
+  max-width: 100%;
 }
 
 h1 {
